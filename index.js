@@ -22,34 +22,3 @@ http.listen(8000, function() {
 
 poloniex(io);
 bittrex(io);
-
-
-
-// setInterval(async function() {
-//     // let poloniexOrderBook = await new Poloniex().returnOrderBook('BTC_ETH', 10);
-//     console.log(poloniexOrderBook);
-//     let stockprice = Math.floor(Math.random() * 1000);
-//     io.emit('poloniex order book', poloniexOrderBook);
-// }, 1000);
-//
-//
-// connection.onopen = function (session) {
-//     function marketEvent (args,kwargs) {
-//         console.log(args);
-//     }
-//     function tickerEvent (args,kwargs) {
-//         console.log(args);
-//     }
-//     function trollboxEvent (args,kwargs) {
-//         console.log(args);
-//     }
-//     session.subscribe('BTC_ETH', marketEvent);
-//     session.subscribe('ticker', tickerEvent);
-//     session.subscribe('trollbox', trollboxEvent);
-// };
-//
-// connection.onclose = function () {
-//     console.log("Websocket connection closed");
-// };
-//
-// connection.open();
