@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+    <title>Live stock price ticker</title>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <script>
+        $(function () {
+            let socket = io();
+
+            socket.on('poloniex order book', function(orderBook) {
+                $('#stockprice').text(orderBook);
+            });
+            socket.on('bittrex order book', function(data) {
+                $('#test').text(data);
+            });
+
+        });
+    </script>
+
+</head>
+<body>
+Stock price: <span id="stockprice">no data yet</span>
+WebsocketClient: <span id="test">no data yet</span>
+</body>
+</html>
