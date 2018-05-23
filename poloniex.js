@@ -15,6 +15,7 @@ function subscribeToPoloniex(io) {
         if (channelName === 'BTC_ETH') {
             console.log(`order book and trade updates received for currency pair ${channelName}`);
             // console.log(`data sequence number is ${seq}`);
+            // io.emit('poloniex order book', data);
             io.emit('poloniex order book', 'success');
         }
     });

@@ -14,7 +14,8 @@ function subscribeToBittrex(io) {
                         data.A.forEach(function(data_for) {
                             console.log('Market Update for '+ data_for.MarketName, data_for);
                         });
-                        io.emit('bittrex order book', 'success')
+                        // io.emit('bittrex order book', data);
+                        io.emit('bittrex order book', 'success');
                     }
                 });
             },
