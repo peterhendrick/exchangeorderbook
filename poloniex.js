@@ -1,36 +1,52 @@
 'use strict';
 
 const Poloniex = require('poloniex-api-node');
+const _ = require('lodash');
 
 module.exports = subscribeToPoloniex;
 
 function subscribeToPoloniex(io) {
     let poloniex = new Poloniex();
     poloniex.subscribe('BTC_ETH');
-    poloniex.on('message', (channelName, data, seq) => {
-        if (channelName === 'ticker') {
-            console.log(`Ticker: ${data}`);
-        }
-
+    poloniex.on('message', (channelName, response, seq) => {
         if (channelName === 'BTC_ETH') {
+            let formattedBTCETHData = _formatData(response, seq);
             console.log(`order book and trade updates received for currency pair ${channelName}`);
             // console.log(`data sequence number is ${seq}`);
-            // io.emit('poloniex order book', data);
+            // io.emit('poloniex order book', formattedData);
             io.emit('poloniex order book', 'success');
         }
     });
-
-    poloniex.on('open', () => {
-        console.log(`Poloniex WebSocket connection open`);
-    });
-
-    poloniex.on('close', (reason, details) => {
-        console.log(`Poloniex WebSocket connection disconnected`);
-    });
-
-    poloniex.on('error', (error) => {
-        console.log(`An error has occured`);
+    poloniex.on('error', error => {
+        console.log(`An error has occurred: ${error}`);
     });
 
     poloniex.openWebSocket({version: 2});
+}
+
+function _formatData(response, seq) {
+    let book = response[0];
+    let asks = _.chain(book.data.asks)
+        .map((value, key) => {
+            return {
+                price: key,
+                volume: value,
+                exchange: 'Poloniex',
+                seq: seq
+            };
+        })
+        .orderBy(['price'], ['asc'])
+        .value();
+    let bids = _.chain(book.data.bids)
+        .map((value, key) => {
+            return {
+                price: key,
+                volume: value,
+                exchange: 'Poloniex',
+                seq: seq
+            };
+        })
+        .orderBy(['price'], ['desc'])
+        .value();
+    return {bids: bids, asks: asks};
 }
