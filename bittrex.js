@@ -1,7 +1,8 @@
 'use strict';
 
-const Bittrex = require('node-bittrex-api');
-const _ = require('lodash');
+const Bittrex = require('node-bittrex-api'),
+    combineOrderBooks = require('./combined'),
+    _ = require('lodash');
 
 module.exports = subscribeToBittrex;
 
@@ -13,8 +14,9 @@ function subscribeToBittrex(io) {
                     if (data.M === 'updateExchangeState') {
                         Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(response) {
                             let formattedBTCETHData = _formatData(response.result, data.Nounce, data.MarketName);
-                            // io.emit('bittrex order book', formattedBTCETHData);
-                            io.emit('bittrex order book', 'success');
+                            combineOrderBooks(io, null, formattedBTCETHData);
+                            // io.emit('bittrex', formattedBTCETHData);
+                            // io.emit('bittrex order book', 'success');
                         });
                     }
                 });
