@@ -50,26 +50,28 @@ function connect(io) {
 
 function _formatData(book, seq, market) {
     let asks = _.chain(book.sell)
-        .map(ask => {
-            return {
-                price: ask.Rate,
-                volume: ask.Quantity,
-                exchange: 'Bittrex',
-                market: market
-            }
-        })
+        .map(ask => _createItemObject(ask, market))
         .orderBy(['price'], ['asc'])
         .value();
     let bids = _.chain(book.buy)
-        .map(bid => {
-            return {
-                price: bid.Rate,
-                volume: bid.Quantity,
-                exchange: 'Bittrex',
-                market: market
-            }
-        })
+        .map(bid => _createItemObject(bid, market))
         .orderBy(['price'], ['desc'])
         .value();
     return {bids: bids, asks: asks, seq: seq};
+}
+
+/**
+ * Creates a formatted object to be sent to the client
+ * @param data: [Object] Ask or bid item to be formatted
+ * @param market: [String] Cryptocurrency pair
+ * @returns [Object] Formatted ask or bid object
+ * @private
+ */
+function _createItemObject(data, market) {
+    return {
+        price: data.Rate,
+        volume: data.Quantity,
+        exchange: 'Bittrex',
+        market: market
+    };
 }
