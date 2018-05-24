@@ -1,21 +1,21 @@
 {
-  "name": "exchangeorders",
-  "version": "1.0.0",
-  "description": "Displays combined orderbooks from multiple exchanges",
-  "main": "server.js",
-  "scripts": {
-    "test": "test",
-    "start": "node server.js"
-  },
-  "author": "Peter Hendrick",
-  "license": "MIT",
-  "dependencies": {
-    "autobahn": "^18.3.2",
-    "express": "^4.16.3",
-    "jquery": "^3.3.1",
-    "lodash": "^4.17.10",
-    "node-bittrex-api": "^0.8.3",
-    "poloniex-api-node": "^1.9.0",
-    "socket.io": "^2.1.1"
-  }
+    "name": "exchangeorders",
+    "version": "1.0.0",
+    "description": "Displays combined orderbooks from multiple exchanges",
+    "main": "server.js",
+    "scripts": {
+        "test": "test",
+        "start": "node server.js"
+    },
+    "author": "Peter Hendrick",
+    "license": "MIT",
+    "dependencies": {
+        "autobahn": "^18.3.2",
+        "express": "^4.16.3",
+        "jquery": "^3.3.1",
+        "lodash": "^4.17.10",
+        "node-bittrex-api": "^0.8.3",
+        "poloniex-api-node": "^1.9.0",
+        "socket.io": "^2.1.1"
+    }
 }
