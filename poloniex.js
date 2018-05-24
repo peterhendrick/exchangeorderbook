@@ -10,9 +10,8 @@ function subscribeToPoloniex(io) {
     poloniex.subscribe('BTC_ETH');
     poloniex.on('message', (channelName, response, seq) => {
         if (channelName === 'BTC_ETH') {
-            let formattedBTCETHData = _formatData(response, seq);
+            let formattedBTCETHData = _formatData(response, seq, channelName);
             console.log(`order book and trade updates received for currency pair ${channelName}`);
-            // console.log(`data sequence number is ${seq}`);
             // io.emit('poloniex order book', formattedData);
             io.emit('poloniex order book', 'success');
         }
@@ -24,7 +23,7 @@ function subscribeToPoloniex(io) {
     poloniex.openWebSocket({version: 2});
 }
 
-function _formatData(response, seq) {
+function _formatData(response, seq, market) {
     let book = response[0];
     let asks = _.chain(book.data.asks)
         .map((value, key) => {
@@ -32,7 +31,8 @@ function _formatData(response, seq) {
                 price: key,
                 volume: value,
                 exchange: 'Poloniex',
-                seq: seq
+                seq: seq,
+                market: market
             };
         })
         .orderBy(['price'], ['asc'])
@@ -43,7 +43,8 @@ function _formatData(response, seq) {
                 price: key,
                 volume: value,
                 exchange: 'Poloniex',
-                seq: seq
+                seq: seq,
+                market: market
             };
         })
         .orderBy(['price'], ['desc'])
