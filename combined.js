@@ -1,12 +1,12 @@
 'use strict';
 
 const _ = require('lodash');
-let poloniex = {bids: [], asks: []};
-let poloniexAskHead = {};
-let poloniexBidHead = {};
-let bittrex = {bids: [], asks: []};
-let bittrexAskHead = {};
-let bittrexBidHead = {};
+let poloniex = {bids: [], asks: []},
+    poloniexAskHead = {},
+    poloniexBidHead = {},
+    bittrex = {bids: [], asks: []},
+    bittrexAskHead = {},
+    bittrexBidHead = {};
 
 module.exports = combineOrderBooks;
 

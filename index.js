@@ -1,11 +1,11 @@
 'use strict';
 
-let express = require('express');
-let app = express();
-let http = require('http').Server(app);
-let io = require('socket.io')(http);
-let subscribeToPoloniex = require('./poloniex');
-let subscribeToBittrex = require('./bittrex');
+const express = require('express'),
+    app = express(),
+    http = require('http').Server(app),
+    io = require('socket.io')(http),
+    subscribeToPoloniex = require('./poloniex'),
+    subscribeToBittrex = require('./bittrex');
 
 
 app.get('/', function(req, res) {
