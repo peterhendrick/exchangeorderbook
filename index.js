@@ -4,8 +4,8 @@ let express = require('express');
 let app = express();
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
-let poloniex = require('./poloniex');
-let bittrex = require('./bittrex');
+let subscribeToPoloniex = require('./poloniex');
+let subscribeToBittrex = require('./bittrex');
 
 
 app.get('/', function(req, res) {
@@ -19,5 +19,5 @@ http.listen(8000, function() {
     console.log('Listening on *:8000');
 });
 
-poloniex(io);
-bittrex(io);
+subscribeToPoloniex(io);
+subscribeToBittrex(io);
