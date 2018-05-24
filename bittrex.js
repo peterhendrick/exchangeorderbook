@@ -9,14 +9,13 @@ function subscribeToBittrex(io) {
     Bittrex.options({
         websockets: {
             onConnect: function() {
-                console.log('Websocket connected');
                 Bittrex.websockets.subscribe(['BTC-ETH'], function(data) {
                     if (data.M === 'updateExchangeState') {
                         Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(response) {
                             let formattedBTCETHData = _formatData(response.result, data.Nounce, data.MarketName);
-                            console.log(data);
+                            // io.emit('bittrex order book', formattedBTCETHData);
+                            io.emit('bittrex order book', 'success');
                         });
-                        io.emit('bittrex order book', 'success');
                     }
                 });
             }
