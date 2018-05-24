@@ -6,26 +6,47 @@ const Bittrex = require('node-bittrex-api'),
 
 module.exports = subscribeToBittrex;
 
+/**
+ * Subscribe to the Bittrex websocket
+ * @param io: passes socket.io to be used by the combineOrderBooks module
+ */
 function subscribeToBittrex(io) {
     Bittrex.options({
         websockets: {
-            onConnect: function() {
-                Bittrex.websockets.subscribe(['BTC-ETH'], function(data) {
-                    if (data.M === 'updateExchangeState') {
-                        Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(response) {
-                            let formattedBTCETHData = _formatData(response.result, data.Nounce, data.MarketName);
-                            combineOrderBooks(io, null, formattedBTCETHData);
-                            // io.emit('bittrex', formattedBTCETHData);
-                            // io.emit('bittrex order book', 'success');
-                        });
-                    }
-                });
-            }
+            onConnect: connect(io)
         }
     });
 
     Bittrex.websockets.client();
 }
+
+/**
+ * Connect to Bittrex, make call to get order book and format response
+ * @param io: passes socket.io to be used by the combineOrderBooks module
+ */
+function connect(io) {
+    Bittrex.websockets.subscribe(['BTC-ETH'], function(data) {
+        if (data.M === 'updateExchangeState') {
+            Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(response, err) {
+                let formattedData = _formatData(response.result, data.Nounce, data.MarketName);
+                formattedData.asks = _.slice(formattedData.asks, 0, 50);
+                formattedData.bids = _.slice(formattedData.bids, 0, 50);
+                combineOrderBooks(io, null, formattedData);
+                // io.emit('bittrex', formattedData);
+                // io.emit('bittrex order book', 'success');
+            });
+        }
+    });
+}
+
+/**
+ * Format Bittrex Response
+ * @param book: [Object] The first item in the array response from Bittrex.
+ * @param seq: [Number] Sequence number included with the response
+ * @param market: [String] Cryptocurrecny pair with bids or asks
+ * @returns {{bids: *, asks: *}}: [Object] Formatted object to be combined with other exchange data.
+ * @private
+ */
 
 function _formatData(book, seq, market) {
     let asks = _.chain(book.sell)
@@ -34,7 +55,6 @@ function _formatData(book, seq, market) {
                 price: ask.Rate,
                 volume: ask.Quantity,
                 exchange: 'Bittrex',
-                seq: seq,
                 market: market
             }
         })
@@ -46,11 +66,10 @@ function _formatData(book, seq, market) {
                 price: bid.Rate,
                 volume: bid.Quantity,
                 exchange: 'Bittrex',
-                seq: seq,
                 market: market
             }
         })
         .orderBy(['price'], ['desc'])
         .value();
-    return {bids: bids, asks: asks};
+    return {bids: bids, asks: asks, seq: seq};
 }
