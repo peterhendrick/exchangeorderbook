@@ -16,7 +16,11 @@ function subscribeToPoloniex(io) {
 
     poloniex.subscribe('BTC_ETH');
     poloniex.on('message', (channelName, response, seq) => {
-        _proccessResponse(io, channelName, response, seq)
+        try{
+            _proccessResponse(io, channelName, response, seq)
+        } catch (err) {
+            console.log(`Error in Poloniex Response`);
+        }
     });
     poloniex.on('error', error => console.log(`An error has occurred: ${error}`));
 

@@ -27,13 +27,15 @@ function subscribeToBittrex(io) {
 function connect(io) {
     Bittrex.websockets.subscribe(['BTC-ETH'], function(data) {
         if (data.M === 'updateExchangeState') {
-            Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(response, err) {
-                let formattedData = _formatData(response.result, data.Nounce, data.MarketName);
-                formattedData.asks = _.slice(formattedData.asks, 0, 50);
-                formattedData.bids = _.slice(formattedData.bids, 0, 50);
-                combineOrderBooks(io, null, formattedData);
-                // io.emit('bittrex', formattedData);
-                // io.emit('bittrex order book', 'success');
+            Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(response) {
+                try{
+                    let formattedData = _formatData(response.result, data.A[0].Nounce, data.A[0].MarketName);
+                    formattedData.asks = _.slice(formattedData.asks, 0, 50);
+                    formattedData.bids = _.slice(formattedData.bids, 0, 50);
+                    combineOrderBooks(io, null, formattedData);
+                } catch (err) {
+                    console.log(`Error in bittrex response`);
+                }
             });
         }
     });
@@ -69,8 +71,8 @@ function _formatData(book, seq, market) {
  */
 function _createItemObject(data, market) {
     return {
-        price: data.Rate,
-        volume: data.Quantity,
+        price: data.Rate.toString(),
+        volume: data.Quantity.toString(),
         exchange: 'Bittrex',
         market: market
     };
