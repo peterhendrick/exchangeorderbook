@@ -74,6 +74,6 @@ function _createItemObject(data, market) {
         price: data.Rate.toString(),
         volume: data.Quantity.toString(),
         exchange: 'Bittrex',
-        market: market
+        market: market.replace(/-/g, '_')
     };
 }
