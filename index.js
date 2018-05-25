@@ -17,7 +17,7 @@ app.use('/scripts', express.static(__dirname + '/node_modules/datatables/media/j
 app.use('/public', express.static(__dirname + '/public'));
 
 http.listen(8000, function() {
-    console.log('Listening on *:8000');
+    console.log('Listening on port 8000');
 });
 
 subscribeToPoloniex(io);
