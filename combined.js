@@ -24,7 +24,7 @@ function combineOrderBooks(io, poloniexOrderBook, bittrexOrderBook) {
         .orderBy(['price'], ['desc'])
         .value();
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);
-    let combinedOrderBook = {bids: combinedBids, asks: combinedAsks};
+    let combinedOrderBook = {bids: combinedBids.slice(0, 50), asks: combinedAsks.slice(0, 50)};
     io.emit('combined books', combinedOrderBook);
 
 }

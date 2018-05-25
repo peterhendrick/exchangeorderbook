@@ -1,24 +1,26 @@
 $(function () {
     let socket = io();
-    let bidTable;
-    let askTable;
-    let dtBid = $('#bidTable').DataTable({
-        show: false,
-        search: false
+    let bidDT = $('#bidTable').DataTable({
+        paging: false,
+        pageLength: 50,
+        searching: false,
+        lengthChange: false
     });
-    let dtAsk = $('#askTable').DataTable({
-        show: false,
-        search: false
+    let askDT = $('#askTable').DataTable({
+        paging: false,
+        pageLength: 50,
+        searching: false,
+        lengthChange: false
     });
 
     socket.on('combined books', function(orderBook) {
         let asks = orderBook.asks;
         let bids = orderBook.bids;
-        _createTable(bids, '#bidTable', dtBid);
-        _createTable(asks, '#askTable', dtAsk);
+        _createTable(bids, bidDT);
+        _createTable(asks, askDT);
     });
 
-    function _createTable(orderBook, tableId, dataTable) {
+    function _createTable(orderBook, dataTable) {
         dataTable.clear();
         orderBook.forEach(order => {
             let row = $('<tr>');
