@@ -3,10 +3,30 @@
     <head>
         <title>Live stock price ticker</title>
         <script src="/socket.io/socket.io.js"></script>
-        <script src="/jquery/jquery.min.js"></script>
+        <script src="/scripts/jquery.min.js"></script>
+        <script src="/scripts/jquery.dataTables.min.js"></script>
         <script src="/public/controller.js"></script>
     </head>
     <body>
-        Stock price: <span id="stockprice">no data yet</span>
+        <table id="bidTable">
+            <thead>
+            <tr>
+                <th>price</th>
+                <th>volume</th>
+                <th>exchange</th>
+                <th>market</th>
+            </tr>
+            </thead>
+        </table>
+        <table id="askTable">
+            <thead>
+            <tr>
+                <th>price</th>
+                <th>volume</th>
+                <th>exchange</th>
+                <th>market</th>
+            </tr>
+            </thead>
+        </table>
     </body>
 </html>
