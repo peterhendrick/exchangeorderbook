@@ -45,9 +45,9 @@ function subscribeToPoloniex(io) {
             if(response[0].type === 'orderBookRemove') {
                 formattedData = _removeItem(response[0].data, seq, formattedData, channelName);
             }
-            if(formattedData.asks.length > 50) formattedData.asks = _.slice(formattedData.asks, 0, 50);
-            if(formattedData.bids.length > 50) formattedData.bids = _.slice(formattedData.bids, 0, 50);
-            combineOrderBooks(io, formattedData, null);
+            if(formattedData.asks.length > 100) formattedData.asks = _.slice(formattedData.asks, 0, 100);
+            if(formattedData.bids.length > 100) formattedData.bids = _.slice(formattedData.bids, 0, 100);
+            combineOrderBooks(io, formattedData, null, null);
         }
     }
 }

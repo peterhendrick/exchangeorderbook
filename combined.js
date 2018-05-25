@@ -2,7 +2,8 @@
 
 const _ = require('lodash');
 let poloniex = {bids: [], asks: []},
-    bittrex = {bids: [], asks: []};
+    bittrex = {bids: [], asks: []},
+    binance = {bids: [], asks: []};
 
 module.exports = combineOrderBooks;
 
@@ -12,15 +13,18 @@ module.exports = combineOrderBooks;
  * @param poloniexOrderBook: [Object] Formatted order book from the Poloniex Exchange
  * @param bittrexOrderBook: [Object] Formatted order book from the Bittrex Exchange
  */
-function combineOrderBooks(io, poloniexOrderBook, bittrexOrderBook) {
+function combineOrderBooks(io, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
     if(poloniexOrderBook !== null) poloniex = poloniexOrderBook;
     if(bittrexOrderBook !== null) bittrex = bittrexOrderBook;
+    if(binanceOrderBook !== null) binance = binanceOrderBook;
     let combinedAsks = _.chain(bittrex.asks)
         .concat(poloniex.asks)
+        .concat(binance.asks)
         .orderBy(['price'], ['asc'])
         .value();
     let combinedBids = _.chain(bittrex.bids)
         .concat(poloniex.bids)
+        .concat(binance.bids)
         .orderBy(['price'], ['desc'])
         .value();
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);

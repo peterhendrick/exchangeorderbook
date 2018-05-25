@@ -30,9 +30,9 @@ function connect(io) {
             Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(response) {
                 try{
                     let formattedData = _formatData(response.result, data.A[0].Nounce, data.A[0].MarketName);
-                    formattedData.asks = _.slice(formattedData.asks, 0, 50);
-                    formattedData.bids = _.slice(formattedData.bids, 0, 50);
-                    combineOrderBooks(io, null, formattedData);
+                    formattedData.asks = _.slice(formattedData.asks, 0, 100);
+                    formattedData.bids = _.slice(formattedData.bids, 0, 100);
+                    combineOrderBooks(io, null, formattedData, null);
                 } catch (err) {
                     console.log(`Error in bittrex response`);
                 }

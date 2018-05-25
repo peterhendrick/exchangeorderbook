@@ -4,6 +4,7 @@ const express = require('express'),
     app = express(),
     http = require('http').Server(app),
     io = require('socket.io')(http),
+    subscribeToBinance = require('./binance'),
     subscribeToPoloniex = require('./poloniex'),
     subscribeToBittrex = require('./bittrex');
 
@@ -22,3 +23,4 @@ http.listen(8000, function() {
 
 subscribeToPoloniex(io);
 subscribeToBittrex(io);
+subscribeToBinance(io);
