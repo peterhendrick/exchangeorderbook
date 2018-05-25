@@ -25,7 +25,6 @@ function combineOrderBooks(io, poloniexOrderBook, bittrexOrderBook) {
         .value();
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);
     let combinedOrderBook = {bids: combinedBids, asks: combinedAsks};
-    io.emit('combined books', 'success');
-    // io.emit('combined books', combinedOrderBook);
+    io.emit('combined books', combinedOrderBook);
 
 }

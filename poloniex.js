@@ -48,7 +48,6 @@ function subscribeToPoloniex(io) {
             if(formattedData.asks.length > 50) formattedData.asks = _.slice(formattedData.asks, 0, 50);
             if(formattedData.bids.length > 50) formattedData.bids = _.slice(formattedData.bids, 0, 50);
             combineOrderBooks(io, formattedData, null);
-            // io.emit('poloniex', formattedData);
         }
     }
 }
