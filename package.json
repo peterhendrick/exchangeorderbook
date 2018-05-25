@@ -14,6 +14,7 @@
         "express": "^4.16.3",
         "jquery": "^3.3.1",
         "lodash": "^4.17.10",
+        "node-binance-api": "^0.6.0",
         "node-bittrex-api": "^0.8.3",
         "poloniex-api-node": "^1.9.0",
         "socket.io": "^2.1.1"
