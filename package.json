@@ -2,7 +2,7 @@
     "name": "exchangeorders",
     "version": "1.0.0",
     "description": "Displays combined orderbooks from multiple exchanges",
-    "main": "server.js",
+    "main": "index.js",
     "scripts": {
         "test": "test",
         "start": "node index.js"
