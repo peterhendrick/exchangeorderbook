@@ -14,10 +14,8 @@ $(function () {
     });
 
     socket.on('combined books', function(orderBook) {
-        let asks = orderBook.asks;
-        let bids = orderBook.bids;
-        _createTable(bids, bidDT);
-        _createTable(asks, askDT);
+        _createTable(orderBook.bids, bidDT);
+        _createTable(orderBook.asks, askDT);
     });
 
     function _createTable(orderBook, dataTable) {
@@ -32,5 +30,4 @@ $(function () {
         });
         dataTable.draw();
     }
-
 });
