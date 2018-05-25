@@ -10,7 +10,7 @@
     "author": "Peter Hendrick",
     "license": "MIT",
     "dependencies": {
-        "autobahn": "^18.3.2",
+        "datatables": "^1.10.13",
         "express": "^4.16.3",
         "jquery": "^3.3.1",
         "lodash": "^4.17.10",
