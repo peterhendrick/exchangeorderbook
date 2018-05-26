@@ -26,7 +26,7 @@ $(function () {
     socket.on('combined BTC_ETH books', function(orderBook) {
         BTC_ETHHOrderBook = orderBook;
         if($('#radio_1').is(':checked')) {
-            _updateTables(BTC_ETHHOrderBook)
+            _updateTables(BTC_ETHHOrderBook);
         }
     });
 
