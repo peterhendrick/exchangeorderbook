@@ -4,9 +4,9 @@ const express = require('express'),
     app = express(),
     http = require('http').Server(app),
     io = require('socket.io')(http),
-    subscribeToBinance = require('./binance'),
-    subscribeToPoloniex = require('./poloniex'),
-    subscribeToBittrex = require('./bittrex');
+    subscribeToBinance = require('./server/binance'),
+    subscribeToPoloniex = require('./server/poloniex'),
+    subscribeToBittrex = require('./server/bittrex');
 
 
 app.get('/', function(req, res) {
