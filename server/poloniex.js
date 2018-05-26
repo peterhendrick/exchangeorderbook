@@ -24,9 +24,9 @@ function subscribeToPoloniex(io) {
         let BTC_BCHResponse = await poloniex.returnOrderBook('BTC_BCH', 100);
         BTC_ETHResponse = _formatResponse(BTC_ETHResponse);
         BTC_BCHResponse = _formatResponse(BTC_BCHResponse);
-        _proccessResponse(io, channelName, BTC_ETHResponse, null, null);
-        _proccessResponse(io, channelName, BTC_BCHResponse, null, null);
-    }, 5000);
+        _proccessResponse(io, 'BTC_ETH', BTC_ETHResponse, null, null);
+        _proccessResponse(io, 'BTC_BCH', BTC_BCHResponse, null, null);
+    }, 60000);
     poloniex.on('message', (channelName, response, seq) => {
         try{
             _proccessResponse(io, channelName, response, seq);
