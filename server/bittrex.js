@@ -42,7 +42,7 @@ async function connect(io) {
     });
 
     async function _updateBaseData() {
-        // Bittrex module breaks node convention and returns success as first callback parameter
+        // The Bittrex module breaks nodejs convention and returns success as first callback parameter
         // bluebird treats this first parameter as an error so need to catch and return the error.
         let ethOrderBook = await orderbookPromise({ market : 'BTC-ETH', type : 'both' }).catch(err => err);
         let bchOrderBook = await orderbookPromise({ market : 'BTC-BCC', type : 'both' }).catch(err => err);
