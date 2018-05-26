@@ -15,6 +15,7 @@ function subscribeToPoloniex(io) {
     let formattedData;
 
     poloniex.subscribe('BTC_ETH');
+    poloniex.subscribe('BTC_BCH');
     poloniex.on('message', (channelName, response, seq) => {
         try{
             _proccessResponse(io, channelName, response, seq)

@@ -22,5 +22,5 @@ http.listen((process.env.PORT || 8000), function() {
 });
 
 subscribeToPoloniex(io);
-subscribeToBittrex(io);
-subscribeToBinance(io);
+// subscribeToBittrex(io);
+// subscribeToBinance(io);
