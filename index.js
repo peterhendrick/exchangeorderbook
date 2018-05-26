@@ -15,6 +15,7 @@ app.get('/', function(req, res) {
 
 app.use('/scripts', express.static(__dirname + '/node_modules/jquery/dist/'));
 app.use('/scripts', express.static(__dirname + '/node_modules/datatables/media/js/'));
+app.use('/scripts', express.static(__dirname + '/node_modules/lodash/'));
 app.use('/public', express.static(__dirname + '/public'));
 
 http.listen((process.env.PORT || 8000), function() {
