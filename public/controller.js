@@ -22,7 +22,9 @@ $(function () {
     });
 
     socket.on('combined BTC_BCH books', function(orderBook) {
-        console.log();
+        _setHighlights(orderBook);
+        // _createTable(orderBook.bids, bidDT, 'bids');
+        // _createTable(orderBook.asks, askDT, 'asks');
     });
 
     function _createTable(orderBook, dataTable, type) {
