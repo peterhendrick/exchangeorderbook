@@ -19,8 +19,8 @@ module.exports = combineOrderBooks;
  * @param binanceOrderBook: [Object] Formatted order book from the Binance Exchange
  */
 function combineOrderBooks(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
-    if(channelName === 'BTC_ETH') _formatAndEmitBTCETH(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook)
-    if(channelName === 'BTC_BCH') _formatAndEmitBTCBCH(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook)
+    if(channelName === 'BTC_ETH') _formatAndEmitBTCETH(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook);
+    if(channelName === 'BTC_BCH') _formatAndEmitBTCBCH(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook);
 }
 
 function _formatAndEmitBTCETH(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
