@@ -10,7 +10,11 @@ const express = require('express'),
 
 
 app.get('/', function(req, res) {
-    res.sendFile(__dirname + '/index.html');
+    try {
+        res.sendFile(__dirname + '/index.html');
+    } catch (err) {
+        console.log('Could not get / ' + err);
+    }
 });
 
 app.use('/scripts', express.static(__dirname + '/node_modules/jquery/dist/'));
