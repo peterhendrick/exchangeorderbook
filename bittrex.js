@@ -25,19 +25,26 @@ function subscribeToBittrex(io) {
  * @param io: passes socket.io to be used by the combineOrderBooks module
  */
 function connect(io) {
-    Bittrex.websockets.subscribe(['BTC-ETH'], function(data) {
-        if (data.M === 'updateExchangeState') {
-            Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(response) {
+
+    Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(initialOrderBook) {
+        let formattedData = initialOrderBook.result;
+        formattedData = _formatInitialData(formattedData, 'BTC_ETH');
+        Bittrex.websockets.subscribe(['BTC-ETH'], function(data) {
+            if (data.M === 'updateExchangeState') {
+                // type: 0 = add, 1 = remove, 2 = update
                 try{
-                    let formattedData = _formatData(response.result, data.A[0].Nounce, data.A[0].MarketName);
+                    let orderBookUpdates = data.A[0];
+                    formattedData.bids = _updateItems(formattedData.bids, orderBookUpdates.Buys, 'desc', 'BTC_ETH');
+                    formattedData.asks = _updateItems(formattedData.asks, orderBookUpdates.Sells, 'asc', 'BTC_ETH');
+
                     formattedData.asks = _.slice(formattedData.asks, 0, 100);
                     formattedData.bids = _.slice(formattedData.bids, 0, 100);
                     combineOrderBooks(io, null, formattedData, null);
                 } catch (err) {
                     console.log(`Error in bittrex response`);
                 }
-            });
-        }
+            }
+        });
     });
 }
 
@@ -50,7 +57,7 @@ function connect(io) {
  * @private
  */
 
-function _formatData(book, seq, market) {
+function _formatInitialData(book, market) {
     let asks = _.chain(book.sell)
         .map(ask => _createItemObject(ask, market))
         .orderBy(['price'], ['asc'])
@@ -59,7 +66,7 @@ function _formatData(book, seq, market) {
         .map(bid => _createItemObject(bid, market))
         .orderBy(['price'], ['desc'])
         .value();
-    return {bids: bids, asks: asks, seq: seq};
+    return {bids: bids, asks: asks};
 }
 
 /**
@@ -74,6 +81,28 @@ function _createItemObject(data, market) {
         price: data.Rate.toString(),
         volume: data.Quantity.toString(),
         exchange: 'Bittrex',
-        market: market.replace(/-/g, '_')
+        market: market
     };
+}
+
+function _updateItems(baseArray, updateArray, sortOrder, market) {
+    let addItems = updateArray.filter(item => item.Type === 0);
+    addItems = _.map(addItems, item => _createItemObject(item, market));
+    let removeItems = updateArray.filter(item => item.Type === 1);
+    removeItems = _.map(removeItems, item => _createItemObject(item, market));
+    let updateItems = updateArray.filter(item => item.Type === 2);
+    updateItems = _.map(updateItems, item => _createItemObject(item, market));
+
+    baseArray = _.concat(baseArray, addItems);
+    removeItems.forEach(item => {
+        baseArray = _.filter(baseArray, initialItem => initialItem.price !== item.price);
+    });
+    updateItems.forEach(item => {
+        baseArray = _.filter(baseArray, initialItem => initialItem.price !== item.price);
+    });
+    baseArray = _.chain(baseArray)
+        .concat(updateItems)
+        .orderBy(['price'], [sortOrder])
+        .value();
+    return baseArray;
 }
