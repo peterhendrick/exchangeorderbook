@@ -22,11 +22,11 @@ function subscribeToPoloniex(io) {
     setInterval(async function () {
         let BTC_ETHResponse = await poloniex.returnOrderBook('BTC_ETH', 100);
         let BTC_BCHResponse = await poloniex.returnOrderBook('BTC_BCH', 100);
-        BTC_ETHResponse = _formatResponse(BTC_ETHResponse);
-        BTC_BCHResponse = _formatResponse(BTC_BCHResponse);
+        BTC_ETHResponse = _formatRESTResponse(BTC_ETHResponse);
+        BTC_BCHResponse = _formatRESTResponse(BTC_BCHResponse);
         _proccessResponse(io, 'BTC_ETH', BTC_ETHResponse, null, null);
         _proccessResponse(io, 'BTC_BCH', BTC_BCHResponse, null, null);
-    }, 60000);
+    }, 5000);
     poloniex.on('message', (channelName, response, seq) => {
         try{
             _proccessResponse(io, channelName, response, seq);
@@ -71,10 +71,19 @@ function subscribeToPoloniex(io) {
     }
 }
 
-function _formatResponse(getOrderBookResponse) {
+function _formatRESTResponse(getOrderBookResponse) {
+    let formattedResponse = {asks: {}, bids: {}};
+    getOrderBookResponse.asks.forEach(ask => {
+        let askObject = _.fromPairs([ask]);
+        _.assign(formattedResponse.asks, askObject);
+    });
+    getOrderBookResponse.bids.forEach(bid => {
+        let bidObject = _.fromPairs([bid]);
+        _.assign(formattedResponse.bids, bidObject);
+    });
     return [
         {
-            data: getOrderBookResponse,
+            data: formattedResponse,
             type: 'orderBook'
         }
     ]
