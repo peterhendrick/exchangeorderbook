@@ -4,17 +4,17 @@ $(function () {
     let BTC_BCHOrderBook;
     let bidDT = $('#bidTable').DataTable({
         paging: false,
-        pageLength: 50,
         searching: false,
         order: [[ 0, 'desc' ]],
-        lengthChange: false
+        lengthChange: false,
+        info: false
     });
     let askDT = $('#askTable').DataTable({
         paging: false,
-        pageLength: 50,
         searching: false,
         order: [[ 0, 'asc' ]],
-        lengthChange: false
+        lengthChange: false,
+        info: false
     });
     $('#radio_1').on('click', function() {
         _updateTables(BTC_ETHHOrderBook);
