@@ -112,9 +112,7 @@ function _updateItems(baseArray, updateArray, sortOrder, market) {
 
     baseArray = _.concat(baseArray, addItems);
     removeItems.forEach(item => {
-        baseArray = _.filter(baseArray, initialItem => {
-            return initialItem.price !== item.price && initialItem.volume !== item.volume;
-        });
+        baseArray = _.filter(baseArray, initialItem => initialItem.price !== item.price);
     });
     updateItems.forEach(item => {
         baseArray = _.filter(baseArray, initialItem => initialItem.price !== item.price);

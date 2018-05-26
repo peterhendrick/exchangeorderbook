@@ -24,23 +24,17 @@ function _formatSymbol(symbol) {
 }
 
 function _processResponse(bids, asks, symbol) {
-    let formattedBids = _.map(bids, (value, key) => {
-        return {
-            price: key,
-            volume: value.toString(),
-            exchange: 'Binance',
-            market: symbol,
-            highlight: false
-        };
-    });
-    let formattedAsks = _.map(asks, (value, key) => {
-        return {
-            price: key,
-            volume: value.toString(),
-            exchange: 'Binance',
-            market: symbol,
-            highlight: false
-        };
-    });
+    let formattedBids = _.map(bids, (value, key) => _createItemObject(value, key, symbol));
+    let formattedAsks = _.map(asks, (value, key) => _createItemObject(value, key, symbol));
     return {bids: formattedBids, asks: formattedAsks};
+}
+
+function _createItemObject(volume, price, symbol) {
+    return {
+        price: price,
+        volume: volume.toString(),
+        exchange: 'Binance',
+        market: symbol,
+        highlight: false
+    };
 }

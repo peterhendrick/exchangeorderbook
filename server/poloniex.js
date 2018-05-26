@@ -102,6 +102,8 @@ function _formatInitialData(book, seq, market) {
 function _addItem(data, seq, formattedData, market) {
     let addAskItem = data.type === 'ask' ? _createItemObject(data, market) : null;
     let addBidItem = data.type === 'bid' ? _createItemObject(data, market) : null;
+    if(addAskItem) formattedData.asks = _filterArray(formattedData.asks, addAskItem);
+    if(addBidItem) formattedData.bids = _filterArray(formattedData.bids, addBidItem);
     formattedData.asks = _.chain(formattedData.asks).concat(addAskItem).orderBy(['price'], ['asc']).compact().value();
     formattedData.bids = _.chain(formattedData.bids).concat(addBidItem).orderBy(['price'], ['desc']).compact().value();
     formattedData.seq = seq;
@@ -134,7 +136,7 @@ function _removeItem(data, seq, formattedData, market) {
  * @private
  */
 function _filterArray(array, filterItem) {
-    return _.filter(array, item => item.price !== filterItem.price && item.volume !== filterItem.volume);
+    return _.filter(array, item => item.price !== filterItem.price);
 }
 
 /**
