@@ -49,10 +49,8 @@ function combineOrderBooks(io, poloniexOrderBook, bittrexOrderBook, binanceOrder
         .value();
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);
     let combinedOrderBook = {bids: combinedBids.slice(0, 50), asks: combinedAsks.slice(0, 50)};
-    if(highestBid > lowestAsk) {
-        combinedOrderBook.bids = _setHighlightProperties(combinedOrderBook.bids, lowestAsk, 'bids');
-        combinedOrderBook.asks = _setHighlightProperties(combinedOrderBook.asks, highestBid, 'asks');
-    }
+    combinedOrderBook.bids = _setHighlightProperties(combinedOrderBook.bids, lowestAsk, 'bids');
+    combinedOrderBook.asks = _setHighlightProperties(combinedOrderBook.asks, highestBid, 'asks');
 
     io.emit('combined books', combinedOrderBook);
 
@@ -61,11 +59,11 @@ function combineOrderBooks(io, poloniexOrderBook, bittrexOrderBook, binanceOrder
 function _setHighlightProperties(book, comparison, type) {
     if(type === 'bids') {
         book.forEach(order => {
-            if(Number(order.price) > comparison) order.highlight = true;
+            order.highlight = (Number(order.price) > comparison);
         });
     } else if(type === 'asks') {
         book.forEach(order => {
-            if(Number(order.price) < comparison) order.highlight = true;
+            order.highlight = (Number(order.price) < comparison);
         });
     }
     return book;

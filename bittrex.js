@@ -29,6 +29,7 @@ function connect(io) {
     Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(initialOrderBook) {
         let formattedData = initialOrderBook.result;
         formattedData = _formatInitialData(formattedData, 'BTC_ETH');
+        combineOrderBooks(io, null, formattedData, null);
         Bittrex.websockets.subscribe(['BTC-ETH'], function(data) {
             if (data.M === 'updateExchangeState') {
                 // type: 0 = add, 1 = remove, 2 = update
