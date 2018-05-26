@@ -7,14 +7,27 @@ $(function () {
         searching: false,
         order: [[ 0, 'desc' ]],
         lengthChange: false,
-        info: false
+        info: false,
+        autoWidth: false,
+        columnDefs: [{
+            "targets": '_all',
+            "createdCell": function (td) {
+                $(td).css('padding', '10px')
+            }
+        }]
     });
     let askDT = $('#askTable').DataTable({
         paging: false,
         searching: false,
         order: [[ 0, 'asc' ]],
         lengthChange: false,
-        info: false
+        info: false,
+        columnDefs: [{
+            "targets": '_all',
+            "createdCell": function (td) {
+                $(td).css('padding', '10px')
+            }
+        }]
     });
     $('#radio_1').on('click', function() {
         _updateTables(BTC_ETHHOrderBook);
