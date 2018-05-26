@@ -1,9 +1,12 @@
 'use strict';
 
 const _ = require('lodash');
-let poloniex = {bids: [], asks: []},
-    bittrex = {bids: [], asks: []},
-    binance = {bids: [], asks: []};
+let poloniexBTCETH = {bids: [], asks: []},
+    poloniexBTCBCH = {bids: [], asks: []},
+    bittrexBTCETH = {bids: [], asks: []},
+    bittrexBTCBCH = {bids: [], asks: []},
+    binanceBTCETH = {bids: [], asks: []},
+    binanceBTCBCH = {bids: [], asks: []};
 
 module.exports = combineOrderBooks;
 
@@ -16,22 +19,41 @@ module.exports = combineOrderBooks;
  * @param binanceOrderBook: [Object] Formatted order book from the Binance Exchange
  */
 function combineOrderBooks(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
-    if(channelName === 'BTC_ETH') _formatAndEmit(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook);
-    if(channelName === 'BTC_BCH') _formatAndEmit(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook);
+    if(channelName === 'BTC_ETH') _formatAndEmitBTCETH(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook)
+    if(channelName === 'BTC_BCH') _formatAndEmitBTCBCH(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook)
 }
 
-function _formatAndEmit(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
-    if(poloniexOrderBook) poloniex = poloniexOrderBook;
-    if(bittrexOrderBook) bittrex = bittrexOrderBook;
-    if(binanceOrderBook) binance = binanceOrderBook;
-    let combinedAsks = _.chain(bittrex.asks)
-        .concat(poloniex.asks)
-        .concat(binance.asks)
+function _formatAndEmitBTCETH(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
+    if(poloniexOrderBook) poloniexBTCETH = poloniexOrderBook;
+    if(bittrexOrderBook) bittrexBTCETH = bittrexOrderBook;
+    if(binanceOrderBook) binanceBTCETH = binanceOrderBook;
+    let combinedAsks = _.chain(bittrexBTCETH.asks)
+        .concat(poloniexBTCETH.asks)
+        .concat(binanceBTCETH.asks)
         .orderBy(['price'], ['asc'])
         .value();
-    let combinedBids = _.chain(bittrex.bids)
-        .concat(poloniex.bids)
-        .concat(binance.bids)
+    let combinedBids = _.chain(poloniexBTCETH.bids)
+        .concat(bittrexBTCETH.bids)
+        .concat(binanceBTCETH.bids)
+        .orderBy(['price'], ['desc'])
+        .value();
+    console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);
+    let combinedOrderBook = {bids: combinedBids.slice(0, 50), asks: combinedAsks.slice(0, 50)};
+    io.emit(`combined ${channelName} books`, combinedOrderBook);
+}
+
+function _formatAndEmitBTCBCH(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
+    if(poloniexOrderBook) poloniexBTCBCH = poloniexOrderBook;
+    if(bittrexOrderBook) bittrexBTCBCH = bittrexOrderBook;
+    if(binanceOrderBook) binanceBTCBCH = binanceOrderBook;
+    let combinedAsks = _.chain(bittrexBTCBCH.asks)
+        .concat(poloniexBTCBCH.asks)
+        .concat(binanceBTCBCH.asks)
+        .orderBy(['price'], ['asc'])
+        .value();
+    let combinedBids = _.chain(poloniexBTCBCH.bids)
+        .concat(bittrexBTCBCH.bids)
+        .concat(binanceBTCBCH.bids)
         .orderBy(['price'], ['desc'])
         .value();
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);

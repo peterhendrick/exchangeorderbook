@@ -25,7 +25,6 @@ function subscribeToBittrex(io) {
  * @param io: passes socket.io to be used by the combineOrderBooks module
  */
 function connect(io) {
-
     Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(ethOrderBook) {
         let formattedETHData = ethOrderBook.result;
         formattedETHData = _formatInitialData(formattedETHData, 'BTC_ETH');
