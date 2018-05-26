@@ -17,6 +17,14 @@ function subscribeToPoloniex(io) {
 
     poloniex.subscribe('BTC_ETH');
     poloniex.subscribe('BTC_BCH');
+    // Poloniex orders were becoming stale due to missed removes or updates, this setInterval function will
+    // refresh the base data every 60 seconds to ensure removal of stale orders.
+    setInterval(async function () {
+        formattedBTCETHData = await poloniex.returnOrderBook('BTC_ETH', 100);
+        formattedBTCBCHData = await poloniex.returnOrderBook('BTC_BCH', 100);
+        combineOrderBooks(io, channelName, formattedBTCETHData, null, null);
+        combineOrderBooks(io, channelName, formattedBTCBCHData, null, null);
+    }, 60000);
     poloniex.on('message', (channelName, response, seq) => {
         try{
             _proccessResponse(io, channelName, response, seq);
