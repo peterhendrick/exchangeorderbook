@@ -17,6 +17,16 @@ function subscribeToPoloniex(io) {
 
     poloniex.subscribe('BTC_ETH');
     poloniex.subscribe('BTC_BCH');
+    // Poloniex orders were becoming stale due to missed removes or updates, this setInterval function will
+    // refresh the base data every 60 seconds to ensure removal of stale orders.
+    setInterval(async function () {
+        let BTC_ETHResponse = await poloniex.returnOrderBook('BTC_ETH', 100);
+        let BTC_BCHResponse = await poloniex.returnOrderBook('BTC_BCH', 100);
+        BTC_ETHResponse = _formatRESTResponse(BTC_ETHResponse);
+        BTC_BCHResponse = _formatRESTResponse(BTC_BCHResponse);
+        _proccessResponse(io, 'BTC_ETH', BTC_ETHResponse, null, null);
+        _proccessResponse(io, 'BTC_BCH', BTC_BCHResponse, null, null);
+    }, 60000);
     poloniex.on('message', (channelName, response, seq) => {
         try{
             _proccessResponse(io, channelName, response, seq);
@@ -59,6 +69,24 @@ function subscribeToPoloniex(io) {
             combineOrderBooks(io, channelName, formattedBTCBCHData, null, null);
         }
     }
+}
+
+function _formatRESTResponse(getOrderBookResponse) {
+    let formattedResponse = {asks: {}, bids: {}};
+    getOrderBookResponse.asks.forEach(ask => {
+        let askObject = _.fromPairs([ask]);
+        _.assign(formattedResponse.asks, askObject);
+    });
+    getOrderBookResponse.bids.forEach(bid => {
+        let bidObject = _.fromPairs([bid]);
+        _.assign(formattedResponse.bids, bidObject);
+    });
+    return [
+        {
+            data: formattedResponse,
+            type: 'orderBook'
+        }
+    ]
 }
 
 /**

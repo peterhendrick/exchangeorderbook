@@ -9,9 +9,16 @@
         <script src="/public/controller.js"></script>
     </head>
     <body>
+    <h1>Combined Order Books</h1>
+    <p>
+        *Bids highlighted in <span style="color: green">green</span> and asks highlighted in
+        <span style="color: red">red</span> indicate overlapping orders across exchanges.
+    </p>
+    <input type="radio" id="radio_1" name="type" value="BTC_ETH">BTC_ETH
+    <input type="radio" id="radio_2" name="type" value="BTC_BCH">BTC_BCH
     <div style="display: flex">
         <div>
-            Bids:
+            <h3>Bids</h3>
             <table id="bidTable">
                 <thead>
                 <tr>
@@ -24,7 +31,7 @@
             </table>
         </div>
         <div  style="flex: 50%">
-            Asks:
+            <h3>Asks</h3>
             <table id="askTable">
                 <thead>
                 <tr>

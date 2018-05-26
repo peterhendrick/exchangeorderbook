@@ -1,5 +1,7 @@
 $(function () {
     let socket = io();
+    let BTC_ETHHOrderBook;
+    let BTC_BCHOrderBook;
     let bidDT = $('#bidTable').DataTable({
         paging: false,
         pageLength: 50,
@@ -14,18 +16,33 @@ $(function () {
         order: [[ 0, 'asc' ]],
         lengthChange: false
     });
+    $('#radio_1').on('click', function() {
+        _updateTables(BTC_ETHHOrderBook);
+    }).click();
+    $('#radio_2').on('click', function() {
+        _updateTables(BTC_BCHOrderBook);
+    });
 
     socket.on('combined BTC_ETH books', function(orderBook) {
+        BTC_ETHHOrderBook = orderBook;
+        if($('#radio_1').is(':checked')) {
+            _updateTables(BTC_ETHHOrderBook);
+        }
+    });
+
+    socket.on('combined BTC_BCH books', function (orderBook) {
+        BTC_BCHOrderBook = orderBook;
+        if($('#radio_2').is(':checked')) {
+            _updateTables(BTC_BCHOrderBook);
+        }
+    });
+
+    function _updateTables(orderBook) {
+        if(!orderBook) return;
         _setHighlights(orderBook);
         _createTable(orderBook.bids, bidDT, 'bids');
         _createTable(orderBook.asks, askDT, 'asks');
-    });
-
-    socket.on('combined BTC_BCH books', function(orderBook) {
-        _setHighlights(orderBook);
-        // _createTable(orderBook.bids, bidDT, 'bids');
-        // _createTable(orderBook.asks, askDT, 'asks');
-    });
+    }
 
     function _createTable(orderBook, dataTable, type) {
         dataTable.clear();
