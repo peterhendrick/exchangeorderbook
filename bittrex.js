@@ -25,28 +25,43 @@ function subscribeToBittrex(io) {
  * @param io: passes socket.io to be used by the combineOrderBooks module
  */
 function connect(io) {
-
-    Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(initialOrderBook) {
-        let formattedData = initialOrderBook.result;
-        formattedData = _formatInitialData(formattedData, 'BTC_ETH');
-        combineOrderBooks(io, null, formattedData, null);
-        Bittrex.websockets.subscribe(['BTC-ETH'], function(data) {
-            if (data.M === 'updateExchangeState') {
-                // type: 0 = add, 1 = remove, 2 = update
-                try{
-                    let orderBookUpdates = data.A[0];
-                    formattedData.bids = _updateItems(formattedData.bids, orderBookUpdates.Buys, 'desc', 'BTC_ETH');
-                    formattedData.asks = _updateItems(formattedData.asks, orderBookUpdates.Sells, 'asc', 'BTC_ETH');
-
-                    formattedData.asks = _.slice(formattedData.asks, 0, 100);
-                    formattedData.bids = _.slice(formattedData.bids, 0, 100);
-                    combineOrderBooks(io, null, formattedData, null);
-                } catch (err) {
-                    console.log(`Error in bittrex response`);
-                }
-            }
-        });
+    Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(ethOrderBook) {
+        let formattedETHData = ethOrderBook.result;
+        formattedETHData = _formatInitialData(formattedETHData, 'BTC_ETH');
+        combineOrderBooks(io, 'BTC_ETH', null, formattedETHData, null);
+        Bittrex.getorderbook({ market: 'BTC-BCC', type: 'both'}, function (bchOrderBook) {
+            let formattedBCHData = bchOrderBook.result;
+            formattedBCHData = _formatInitialData(formattedBCHData, 'BTC_BCH');
+            combineOrderBooks(io, 'BTC_BCH', null, formattedBCHData, null);
+            Bittrex.websockets.subscribe(['BTC-ETH', 'BTC-BCC'], function(data) {
+                if(data.A[0].MarketName === 'BTC-ETH') _formatOrderBook(data, formattedETHData, io);
+                if(data.A[0].MarketName === 'BTC-BCC') _formatOrderBook(data, formattedBCHData, io);
+            });
+        })
     });
+}
+
+function _formatOrderBook(data, formattedData, io) {
+    if (data.M === 'updateExchangeState') {
+        // type: 0 = add, 1 = remove, 2 = update
+        let symbol = _formatSymbol(data.A[0].MarketName);
+        try{
+            let orderBookUpdates = data.A[0];
+            formattedData.bids = _updateItems(formattedData.bids, orderBookUpdates.Buys, 'desc', symbol);
+            formattedData.asks = _updateItems(formattedData.asks, orderBookUpdates.Sells, 'asc', symbol);
+
+            formattedData.asks = _.slice(formattedData.asks, 0, 100);
+            formattedData.bids = _.slice(formattedData.bids, 0, 100);
+            combineOrderBooks(io, symbol, null, formattedData, null);
+        } catch (err) {
+            console.log(`Error in bittrex response`);
+        }
+    }
+}
+
+function _formatSymbol(symbol) {
+    if(symbol === 'BTC-ETH') return 'BTC_ETH';
+    if(symbol === 'BTC-BCC') return 'BTC_BCH';
 }
 
 /**
