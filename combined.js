@@ -27,16 +27,8 @@ function _formatAndEmitBTCETH(io, channelName, poloniexOrderBook, bittrexOrderBo
     if(poloniexOrderBook) poloniexBTCETH = poloniexOrderBook;
     if(bittrexOrderBook) bittrexBTCETH = bittrexOrderBook;
     if(binanceOrderBook) binanceBTCETH = binanceOrderBook;
-    let combinedAsks = _.chain(bittrexBTCETH.asks)
-        .concat(poloniexBTCETH.asks)
-        .concat(binanceBTCETH.asks)
-        .orderBy(['price'], ['asc'])
-        .value();
-    let combinedBids = _.chain(poloniexBTCETH.bids)
-        .concat(bittrexBTCETH.bids)
-        .concat(binanceBTCETH.bids)
-        .orderBy(['price'], ['desc'])
-        .value();
+    let combinedAsks = _combinedArray(bittrexBTCETH.asks, poloniexBTCETH.asks, binanceBTCETH.asks);
+    let combinedBids = _combinedArray(poloniexBTCETH.bids, bittrexBTCETH.bids, binanceBTCETH.bids);
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);
     let combinedOrderBook = {bids: combinedBids.slice(0, 50), asks: combinedAsks.slice(0, 50)};
     io.emit(`combined ${channelName} books`, combinedOrderBook);
@@ -46,17 +38,17 @@ function _formatAndEmitBTCBCH(io, channelName, poloniexOrderBook, bittrexOrderBo
     if(poloniexOrderBook) poloniexBTCBCH = poloniexOrderBook;
     if(bittrexOrderBook) bittrexBTCBCH = bittrexOrderBook;
     if(binanceOrderBook) binanceBTCBCH = binanceOrderBook;
-    let combinedAsks = _.chain(bittrexBTCBCH.asks)
-        .concat(poloniexBTCBCH.asks)
-        .concat(binanceBTCBCH.asks)
-        .orderBy(['price'], ['asc'])
-        .value();
-    let combinedBids = _.chain(poloniexBTCBCH.bids)
-        .concat(bittrexBTCBCH.bids)
-        .concat(binanceBTCBCH.bids)
-        .orderBy(['price'], ['desc'])
-        .value();
+    let combinedAsks = _combinedArray(bittrexBTCBCH.asks, poloniexBTCBCH.asks, binanceBTCBCH.asks);
+    let combinedBids = _combinedArray(poloniexBTCBCH.bids, bittrexBTCBCH.bids, binanceBTCBCH.bids);
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);
     let combinedOrderBook = {bids: combinedBids.slice(0, 50), asks: combinedAsks.slice(0, 50)};
     io.emit(`combined ${channelName} books`, combinedOrderBook);
+}
+
+function _combinedArray(arr1, arr2, arr3) {
+    return _.chain(arr1)
+        .concat(arr2)
+        .concat(arr3)
+        .orderBy(['price'], ['asc'])
+        .value();
 }
