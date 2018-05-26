@@ -27,10 +27,10 @@ function _formatAndEmitBTCETH(io, channelName, poloniexOrderBook, bittrexOrderBo
     if(poloniexOrderBook) poloniexBTCETH = poloniexOrderBook;
     if(bittrexOrderBook) bittrexBTCETH = bittrexOrderBook;
     if(binanceOrderBook) binanceBTCETH = binanceOrderBook;
-    let combinedAsks = _combinedArray(bittrexBTCETH.asks, poloniexBTCETH.asks, binanceBTCETH.asks);
-    let combinedBids = _combinedArray(poloniexBTCETH.bids, bittrexBTCETH.bids, binanceBTCETH.bids);
+    let combinedAsks = _combinedArray(bittrexBTCETH.asks, poloniexBTCETH.asks, binanceBTCETH.asks, 'asc');
+    let combinedBids = _combinedArray(poloniexBTCETH.bids, bittrexBTCETH.bids, binanceBTCETH.bids, 'desc');
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);
-    let combinedOrderBook = {bids: combinedBids.slice(0, 50), asks: combinedAsks.slice(0, 50)};
+    let combinedOrderBook = {bids: combinedBids.slice(0, 250), asks: combinedAsks.slice(0, 250)};
     io.emit(`combined ${channelName} books`, combinedOrderBook);
 }
 
@@ -38,17 +38,17 @@ function _formatAndEmitBTCBCH(io, channelName, poloniexOrderBook, bittrexOrderBo
     if(poloniexOrderBook) poloniexBTCBCH = poloniexOrderBook;
     if(bittrexOrderBook) bittrexBTCBCH = bittrexOrderBook;
     if(binanceOrderBook) binanceBTCBCH = binanceOrderBook;
-    let combinedAsks = _combinedArray(bittrexBTCBCH.asks, poloniexBTCBCH.asks, binanceBTCBCH.asks);
-    let combinedBids = _combinedArray(poloniexBTCBCH.bids, bittrexBTCBCH.bids, binanceBTCBCH.bids);
+    let combinedAsks = _combinedArray(bittrexBTCBCH.asks, poloniexBTCBCH.asks, binanceBTCBCH.asks, 'asc');
+    let combinedBids = _combinedArray(poloniexBTCBCH.bids, bittrexBTCBCH.bids, binanceBTCBCH.bids, 'desc');
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);
-    let combinedOrderBook = {bids: combinedBids.slice(0, 50), asks: combinedAsks.slice(0, 50)};
+    let combinedOrderBook = {bids: combinedBids.slice(0, 250), asks: combinedAsks.slice(0, 250)};
     io.emit(`combined ${channelName} books`, combinedOrderBook);
 }
 
-function _combinedArray(arr1, arr2, arr3) {
+function _combinedArray(arr1, arr2, arr3, sort) {
     return _.chain(arr1)
         .concat(arr2)
         .concat(arr3)
-        .orderBy(['price'], ['asc'])
+        .orderBy(['price'], [sort])
         .value();
 }
