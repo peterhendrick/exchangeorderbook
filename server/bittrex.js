@@ -2,9 +2,12 @@
 
 const Bittrex = require('node-bittrex-api'),
     combineOrderBooks = require('./combined'),
+    bluebird = require('bluebird'),
     _ = require('lodash');
 
 module.exports = subscribeToBittrex;
+
+let orderbookPromise = bluebird.promisify(Bittrex.getorderbook);
 
 /**
  * Subscribe to the Bittrex websocket
@@ -24,21 +27,30 @@ function subscribeToBittrex(io) {
  * Connect to Bittrex, make call to get order book and format response
  * @param io: passes socket.io to be used by the combineOrderBooks module
  */
-function connect(io) {
-    Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(ethOrderBook) {
-        let formattedETHData = ethOrderBook.result;
-        formattedETHData = _formatInitialData(formattedETHData, 'BTC_ETH');
-        combineOrderBooks(io, 'BTC_ETH', null, formattedETHData, null);
-        Bittrex.getorderbook({ market: 'BTC-BCC', type: 'both'}, function (bchOrderBook) {
-            let formattedBCHData = bchOrderBook.result;
-            formattedBCHData = _formatInitialData(formattedBCHData, 'BTC_BCH');
-            combineOrderBooks(io, 'BTC_BCH', null, formattedBCHData, null);
-            Bittrex.websockets.subscribe(['BTC-ETH', 'BTC-BCC'], function(data) {
-                if(data.A[0].MarketName === 'BTC-ETH') _formatOrderBook(data, formattedETHData, io);
-                if(data.A[0].MarketName === 'BTC-BCC') _formatOrderBook(data, formattedBCHData, io);
-            });
-        })
+async function connect(io) {
+    let formattedETHData;
+    let formattedBCHData;
+    await _updateBaseData();
+
+    // Setting interval to replace initial order book every minute in order to remove stale records.
+    setInterval(async function () {
+        await _updateBaseData();
+    }, 60000);
+    Bittrex.websockets.subscribe(['BTC-ETH', 'BTC-BCC'], function(data) {
+        if(data.A[0].MarketName === 'BTC-ETH') _formatOrderBook(data, formattedETHData, io);
+        if(data.A[0].MarketName === 'BTC-BCC') _formatOrderBook(data, formattedBCHData, io);
     });
+
+    async function _updateBaseData() {
+        // Bittrex module breaks node convention and returns success as first callback parameter
+        // bluebird treats this first parameter as an error so need to catch and return the error.
+        let ethOrderBook = await orderbookPromise({ market : 'BTC-ETH', type : 'both' }).catch(err => err);
+        let bchOrderBook = await orderbookPromise({ market : 'BTC-BCC', type : 'both' }).catch(err => err);
+        formattedETHData = _formatInitialData(ethOrderBook.result, 'BTC_ETH');
+        combineOrderBooks(io, 'BTC_ETH', null, formattedETHData, null);
+        formattedBCHData = _formatInitialData(bchOrderBook.result, 'BTC_BCH');
+        combineOrderBooks(io, 'BTC_BCH', null, formattedBCHData, null);
+    }
 }
 
 function _formatOrderBook(data, formattedData, io) {
