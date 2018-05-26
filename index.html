@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Combined Exchange Order Book</title>
+        <link rel="stylesheet" type="text/css" href="/public/style.css" media="screen" />
         <script src="/socket.io/socket.io.js"></script>
         <script src="/scripts/jquery.min.js"></script>
         <script src="/scripts/jquery.dataTables.min.js"></script>
@@ -9,17 +10,20 @@
         <script src="/public/controller.js"></script>
     </head>
     <body>
-    <h1>Combined Order Books</h1>
-    <p>
-        *Bids highlighted in <span style="color: green">green</span> and asks highlighted in
-        <span style="color: red">red</span> indicate overlapping orders across exchanges.
+    <h1 class="text_center">Combined Order Books</h1>
+    <p class="text_center">
+        *Bids highlighted in <span class="bids">green</span> and asks highlighted in
+        <span class="asks">red</span> indicate overlapping orders across exchanges.
     </p>
-    <input type="radio" id="radio_1" name="type" value="BTC_ETH">BTC_ETH
-    <input type="radio" id="radio_2" name="type" value="BTC_BCH">BTC_BCH
-    <div style="display: flex">
-        <div>
-            <h3>Bids</h3>
-            <table id="bidTable">
+    <div class="text_center">
+        <h3>Market</h3>
+        <input type="radio" id="radio_1" name="type" value="BTC_ETH">BTC_ETH
+        <input type="radio" id="radio_2" name="type" value="BTC_BCH">BTC_BCH
+    </div>
+    <div class="tables_container">
+        <div class="table_container">
+            <h2 class="text_center bids">Bids</h2>
+            <table id="bidTable" class="table">
                 <thead>
                 <tr>
                     <th>price</th>
@@ -30,9 +34,9 @@
                 </thead>
             </table>
         </div>
-        <div  style="flex: 50%">
-            <h3>Asks</h3>
-            <table id="askTable">
+        <div class="table_container">
+            <h2 class="text_center asks">Asks</h2>
+            <table id="askTable" class="table">
                 <thead>
                 <tr>
                     <th>price</th>

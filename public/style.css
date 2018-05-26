@@ -1,0 +1,19 @@
+.text_center {
+    text-align: center;
+}
+.bids {
+    color: green;
+}
+.asks {
+    color: red;
+}
+.table {
+    margin-left:auto;
+    margin-right:auto;
+}
+.tables_container {
+    display: flex;
+}
+.table_container {
+    flex: 50%;
+}

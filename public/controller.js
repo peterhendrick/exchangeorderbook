@@ -49,9 +49,9 @@ $(function () {
         orderBook.forEach(order => {
             let row;
             if(order.highlight && type === 'bids') {
-                row = $('<tr style="color: green">');
+                row = $('<tr class="bids">');
             } else if(order.highlight && type === 'asks') {
-                row = $('<tr style="color: red">');
+                row = $('<tr class="asks">');
             } else {
                 row = $('<tr>');
             }
