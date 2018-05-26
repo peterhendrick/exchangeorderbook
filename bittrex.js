@@ -29,6 +29,7 @@ function connect(io) {
     Bittrex.getorderbook({ market : 'BTC-ETH', type : 'both' }, function(initialOrderBook) {
         let formattedData = initialOrderBook.result;
         formattedData = _formatInitialData(formattedData, 'BTC_ETH');
+        combineOrderBooks(io, null, formattedData, null);
         Bittrex.websockets.subscribe(['BTC-ETH'], function(data) {
             if (data.M === 'updateExchangeState') {
                 // type: 0 = add, 1 = remove, 2 = update
@@ -81,16 +82,17 @@ function _createItemObject(data, market) {
         price: data.Rate.toString(),
         volume: data.Quantity.toString(),
         exchange: 'Bittrex',
-        market: market
+        market: market,
+        highlight: false
     };
 }
 
 function _updateItems(baseArray, updateArray, sortOrder, market) {
     let addItems = updateArray.filter(item => item.Type === 0);
-    addItems = _.map(addItems, item => _createItemObject(item, market));
     let removeItems = updateArray.filter(item => item.Type === 1);
-    removeItems = _.map(removeItems, item => _createItemObject(item, market));
     let updateItems = updateArray.filter(item => item.Type === 2);
+    addItems = _.map(addItems, item => _createItemObject(item, market));
+    removeItems = _.map(removeItems, item => _createItemObject(item, market));
     updateItems = _.map(updateItems, item => _createItemObject(item, market));
 
     baseArray = _.concat(baseArray, addItems);
