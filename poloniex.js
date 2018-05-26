@@ -12,10 +12,11 @@ module.exports = subscribeToPoloniex;
  */
 function subscribeToPoloniex(io) {
     let poloniex = new Poloniex();
-    let formattedData;
+    let formattedBTCETHData = {asks: [], bids: []};
+    let formattedBTCBCHData = {asks: [], bids: []};
 
     poloniex.subscribe('BTC_ETH');
-    // poloniex.subscribe('BTC_BCH');
+    poloniex.subscribe('BTC_BCH');
     poloniex.on('message', (channelName, response, seq) => {
         try{
             _proccessResponse(io, channelName, response, seq)
@@ -37,17 +38,26 @@ function subscribeToPoloniex(io) {
      */
     function _proccessResponse(io, channelName, response, seq) {
         if(response[0].type === 'orderBook'){
-            formattedData = _formatInitialData(response[0], seq, channelName);
+            formattedBTCETHData = channelName === 'BTC_ETH' ? _formatInitialData(response[0], seq, channelName) : formattedBTCETHData;
+            formattedBTCBCHData = channelName === 'BTC_BCH' ? _formatInitialData(response[0], seq, channelName) : formattedBTCBCHData;
         }
         if(response[0].type === 'orderBookModify') {
-            formattedData = _addItem(response[0].data, seq, formattedData, channelName);
+            formattedBTCETHData = channelName === 'BTC_ETH' ? _addItem(response[0].data, seq, formattedBTCETHData, channelName) : formattedBTCETHData;
+            formattedBTCBCHData = channelName === 'BTC_BCH' ? _addItem(response[0].data, seq, formattedBTCBCHData, channelName) : formattedBTCBCHData;
         }
         if(response[0].type === 'orderBookRemove') {
-            formattedData = _removeItem(response[0].data, seq, formattedData, channelName);
+            formattedBTCETHData = channelName === 'BTC_ETH' ? _removeItem(response[0].data, seq, formattedBTCETHData, channelName) : formattedBTCETHData;
+            formattedBTCBCHData = channelName === 'BTC_BCH' ? _removeItem(response[0].data, seq, formattedBTCBCHData, channelName) : formattedBTCBCHData;
         }
-        if(formattedData.asks.length > 100) formattedData.asks = _.slice(formattedData.asks, 0, 100);
-        if(formattedData.bids.length > 100) formattedData.bids = _.slice(formattedData.bids, 0, 100);
-        combineOrderBooks(io, channelName, formattedData, null, null);
+        if(formattedBTCETHData.asks.length > 100) formattedBTCETHData.asks = _.slice(formattedBTCETHData.asks, 0, 100);
+        if(formattedBTCETHData.bids.length > 100) formattedBTCETHData.bids = _.slice(formattedBTCETHData.bids, 0, 100);
+        if(formattedBTCBCHData.asks.length > 100) formattedBTCBCHData.asks = _.slice(formattedBTCBCHData.asks, 0, 100);
+        if(formattedBTCBCHData.bids.length > 100) formattedBTCBCHData.bids = _.slice(formattedBTCBCHData.bids, 0, 100);
+        if(channelName === 'BTC_ETH') {
+            combineOrderBooks(io, channelName, formattedBTCETHData, null, null);
+        } else if(channelName === 'BTC_BCH') {
+            combineOrderBooks(io, channelName, formattedBTCBCHData, null, null);
+        }
     }
 }
 
