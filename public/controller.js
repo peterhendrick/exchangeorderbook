@@ -15,10 +15,14 @@ $(function () {
         lengthChange: false
     });
 
-    socket.on('combined books', function(orderBook) {
+    socket.on('combined BTC_ETH books', function(orderBook) {
         _setHighlights(orderBook);
         _createTable(orderBook.bids, bidDT, 'bids');
         _createTable(orderBook.asks, askDT, 'asks');
+    });
+
+    socket.on('combined BTC_BCH books', function(orderBook) {
+        console.log();
     });
 
     function _createTable(orderBook, dataTable, type) {

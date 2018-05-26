@@ -10,11 +10,17 @@ module.exports = combineOrderBooks;
 /**
  * Combines order books from multiple exchanges and emits event and data to the client
  * @param io: [Server] socket.io to send results to the client.
+ * @param channelName: [String] String representing the market pair.
  * @param poloniexOrderBook: [Object] Formatted order book from the Poloniex Exchange
  * @param bittrexOrderBook: [Object] Formatted order book from the Bittrex Exchange
  * @param binanceOrderBook: [Object] Formatted order book from the Binance Exchange
  */
-function combineOrderBooks(io, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
+function combineOrderBooks(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
+    if(channelName === 'BTC_ETH') _formatAndEmit(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook);
+    if(channelName === 'BTC_BCH') _formatAndEmit(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook);
+}
+
+function _formatAndEmit(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
     if(poloniexOrderBook) poloniex = poloniexOrderBook;
     if(bittrexOrderBook) bittrex = bittrexOrderBook;
     if(binanceOrderBook) binance = binanceOrderBook;
@@ -30,5 +36,5 @@ function combineOrderBooks(io, poloniexOrderBook, bittrexOrderBook, binanceOrder
         .value();
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);
     let combinedOrderBook = {bids: combinedBids.slice(0, 50), asks: combinedAsks.slice(0, 50)};
-    io.emit('combined books', combinedOrderBook);
+    io.emit(`combined ${channelName} books`, combinedOrderBook);
 }

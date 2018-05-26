@@ -15,7 +15,7 @@ function subscribeToPoloniex(io) {
     let formattedData;
 
     poloniex.subscribe('BTC_ETH');
-    poloniex.subscribe('BTC_BCH');
+    // poloniex.subscribe('BTC_BCH');
     poloniex.on('message', (channelName, response, seq) => {
         try{
             _proccessResponse(io, channelName, response, seq)
@@ -47,7 +47,7 @@ function subscribeToPoloniex(io) {
         }
         if(formattedData.asks.length > 100) formattedData.asks = _.slice(formattedData.asks, 0, 100);
         if(formattedData.bids.length > 100) formattedData.bids = _.slice(formattedData.bids, 0, 100);
-        combineOrderBooks(io, formattedData, null, null);
+        combineOrderBooks(io, channelName, formattedData, null, null);
     }
 }
 

@@ -7,14 +7,22 @@ const binance = require('node-binance-api'),
 module.exports = subscribeToBinance;
 
 function subscribeToBinance(io) {
-    binance.websockets.depthCache(['ETHBTC'], (symbol, depth) => {
-        let bids = binance.sortBids(depth.bids);
-        let asks = binance.sortAsks(depth.asks);
-        let formattedData = _processResponse(bids, asks, 'BTC_ETH');
-        if(formattedData.asks.length > 100) formattedData.asks = _.slice(formattedData.asks, 0, 100);
-        if(formattedData.bids.length > 100) formattedData.bids = _.slice(formattedData.bids, 0, 100);
-        combineOrderBooks(io, null, null, formattedData);
+    binance.websockets.depthCache(['ETHBTC', 'BCCBTC'], (symbol, depth) => {
+        if(symbol === 'ETHBTC') {
+            symbol = _formatSymbol(symbol);
+            let bids = binance.sortBids(depth.bids);
+            let asks = binance.sortAsks(depth.asks);
+            let formattedData = _processResponse(bids, asks, symbol);
+            if(formattedData.asks.length > 100) formattedData.asks = _.slice(formattedData.asks, 0, 100);
+            if(formattedData.bids.length > 100) formattedData.bids = _.slice(formattedData.bids, 0, 100);
+            combineOrderBooks(io, symbol, null, null, formattedData);
+        }
     });
+}
+
+function _formatSymbol(symbol) {
+    if(symbol === 'ETHBTC') return 'BTC_ETH';
+    if(symbol === 'BCCBTC') return 'BTC_BCH';
 }
 
 function _processResponse(bids, asks, symbol) {
