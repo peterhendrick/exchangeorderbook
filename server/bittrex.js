@@ -37,7 +37,7 @@ function connect(io) {
                 if(data.A[0].MarketName === 'BTC-ETH') _formatOrderBook(data, formattedETHData, io);
                 if(data.A[0].MarketName === 'BTC-BCC') _formatOrderBook(data, formattedBCHData, io);
             });
-        })
+        });
     });
 }
 
@@ -54,7 +54,7 @@ function _formatOrderBook(data, formattedData, io) {
             formattedData.bids = _.slice(formattedData.bids, 0, 100);
             combineOrderBooks(io, symbol, null, formattedData, null);
         } catch (err) {
-            console.log(`Error in bittrex response`);
+            console.log('Error in bittrex response');
         }
     }
 }
