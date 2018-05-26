@@ -30,7 +30,7 @@ function _formatAndEmitBTCETH(io, channelName, poloniexOrderBook, bittrexOrderBo
     let combinedAsks = _combinedArray(bittrexBTCETH.asks, poloniexBTCETH.asks, binanceBTCETH.asks, 'asc');
     let combinedBids = _combinedArray(poloniexBTCETH.bids, bittrexBTCETH.bids, binanceBTCETH.bids, 'desc');
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);
-    let combinedOrderBook = {bids: combinedBids.slice(0, 250), asks: combinedAsks.slice(0, 250)};
+    let combinedOrderBook = {bids: combinedBids.slice(0, 150), asks: combinedAsks.slice(0, 150)};
     io.emit(`combined ${channelName} books`, combinedOrderBook);
 }
 
@@ -41,7 +41,7 @@ function _formatAndEmitBTCBCH(io, channelName, poloniexOrderBook, bittrexOrderBo
     let combinedAsks = _combinedArray(bittrexBTCBCH.asks, poloniexBTCBCH.asks, binanceBTCBCH.asks, 'asc');
     let combinedBids = _combinedArray(poloniexBTCBCH.bids, bittrexBTCBCH.bids, binanceBTCBCH.bids, 'desc');
     console.log(`Bids: ${combinedBids.length}   Asks: ${combinedAsks.length}`);
-    let combinedOrderBook = {bids: combinedBids.slice(0, 250), asks: combinedAsks.slice(0, 250)};
+    let combinedOrderBook = {bids: combinedBids.slice(0, 150), asks: combinedAsks.slice(0, 150)};
     io.emit(`combined ${channelName} books`, combinedOrderBook);
 }
 
