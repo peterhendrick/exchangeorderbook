@@ -50,5 +50,6 @@ function _combinedArray(arr1, arr2, arr3, sort) {
         .concat(arr2)
         .concat(arr3)
         .orderBy(['price'], [sort])
+        .filter(item => !_.includes(item.price, 'e')) // Bittrex was returning weird trades that threw off highlighting
         .value();
 }
