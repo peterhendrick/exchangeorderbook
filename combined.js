@@ -15,9 +15,9 @@ module.exports = combineOrderBooks;
  * @param binanceOrderBook: [Object] Formatted order book from the Binance Exchange
  */
 function combineOrderBooks(io, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
-    if(poloniexOrderBook !== null) poloniex = poloniexOrderBook;
-    if(bittrexOrderBook !== null) bittrex = bittrexOrderBook;
-    if(binanceOrderBook !== null) binance = binanceOrderBook;
+    if(poloniexOrderBook) poloniex = poloniexOrderBook;
+    if(bittrexOrderBook) bittrex = bittrexOrderBook;
+    if(binanceOrderBook) binance = binanceOrderBook;
     let combinedAsks = _.chain(bittrex.asks)
         .concat(poloniex.asks)
         .concat(binance.asks)
