@@ -89,10 +89,10 @@ function _createItemObject(data, market) {
 
 function _updateItems(baseArray, updateArray, sortOrder, market) {
     let addItems = updateArray.filter(item => item.Type === 0);
-    addItems = _.map(addItems, item => _createItemObject(item, market));
     let removeItems = updateArray.filter(item => item.Type === 1);
-    removeItems = _.map(removeItems, item => _createItemObject(item, market));
     let updateItems = updateArray.filter(item => item.Type === 2);
+    addItems = _.map(addItems, item => _createItemObject(item, market));
+    removeItems = _.map(removeItems, item => _createItemObject(item, market));
     updateItems = _.map(updateItems, item => _createItemObject(item, market));
 
     baseArray = _.concat(baseArray, addItems);
