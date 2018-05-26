@@ -140,6 +140,7 @@ function _createItemObject(data, market) {
         price: data.rate,
         volume: data.amount,
         exchange: 'Poloniex',
-        market: market
+        market: market,
+        highlight: false
     };
 }

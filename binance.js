@@ -23,7 +23,8 @@ function _processResponse(bids, asks, symbol) {
             price: key,
             volume: value.toString(),
             exchange: 'Binance',
-            market: symbol
+            market: symbol,
+            highlight: false
         };
     });
     let formattedAsks = _.map(asks, (value, key) => {
@@ -31,7 +32,8 @@ function _processResponse(bids, asks, symbol) {
             price: key,
             volume: value.toString(),
             exchange: 'Binance',
-            market: symbol
+            market: symbol,
+            highlight: false
         };
     });
     return {bids: formattedBids, asks: formattedAsks};
