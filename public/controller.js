@@ -16,6 +16,7 @@ $(function () {
     });
 
     socket.on('combined books', function(orderBook) {
+        _setHighlights(orderBook);
         _createTable(orderBook.bids, bidDT, 'bids');
         _createTable(orderBook.asks, askDT, 'asks');
     });
@@ -38,5 +39,21 @@ $(function () {
             dataTable.rows.add(row);
         });
         dataTable.draw();
+    }
+
+    function _setHighlights(orderBook) {
+        let highestBid = _.head(orderBook.bids);
+        let lowestAsk = _.head(orderBook.asks);
+
+        orderBook.bids.forEach(bid => {
+            if(bid.price > lowestAsk.price) {
+                bid.highlight = true;
+            }
+        });
+        orderBook.asks.forEach(ask => {
+            if(ask.price < highestBid.price) {
+                ask.highlight = true;
+            }
+        });
     }
 });
