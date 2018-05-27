@@ -10,18 +10,26 @@ module.exports = subscribeToPoloniex;
  * Subscribes to Poloniex and processes response
  * @param io: passes socket.io to the combineOrderBooks module
  */
-function subscribeToPoloniex(io) {
+async function subscribeToPoloniex(io) {
     let poloniex = new Poloniex();
     let formattedBTCETHData = {asks: [], bids: []};
     let formattedBTCBCHData = {asks: [], bids: []};
+    let BTC_ETHTicker;
+    let BTC_BCHTicker;
 
     poloniex.subscribe('BTC_ETH');
     poloniex.subscribe('BTC_BCH');
+    let tickers = await poloniex.returnTicker();
+    BTC_ETHTicker = tickers.BTC_ETH.last;
+    BTC_BCHTicker = tickers.BTC_BCH.last;
     // Poloniex orders were becoming stale due to missed removes or updates, this setInterval function will
     // refresh the base data every 60 seconds to ensure removal of stale orders.
     setInterval(async function () {
         let BTC_ETHResponse = await poloniex.returnOrderBook('BTC_ETH', 100);
         let BTC_BCHResponse = await poloniex.returnOrderBook('BTC_BCH', 100);
+        let tickers = await poloniex.returnTicker();
+        BTC_ETHTicker = tickers.BTC_ETH.last;
+        BTC_BCHTicker = tickers.BTC_BCH.last;
         BTC_ETHResponse = _formatRESTResponse(BTC_ETHResponse);
         BTC_BCHResponse = _formatRESTResponse(BTC_BCHResponse);
         _proccessResponse(io, 'BTC_ETH', BTC_ETHResponse, null, null);
@@ -63,6 +71,8 @@ function subscribeToPoloniex(io) {
         if(formattedBTCETHData.bids.length > 100) formattedBTCETHData.bids = _.slice(formattedBTCETHData.bids, 0, 100);
         if(formattedBTCBCHData.asks.length > 100) formattedBTCBCHData.asks = _.slice(formattedBTCBCHData.asks, 0, 100);
         if(formattedBTCBCHData.bids.length > 100) formattedBTCBCHData.bids = _.slice(formattedBTCBCHData.bids, 0, 100);
+        formattedBTCETHData.ticker = BTC_ETHTicker;
+        formattedBTCBCHData.ticker = BTC_BCHTicker;
         if(channelName === 'BTC_ETH') {
             combineOrderBooks(io, channelName, formattedBTCETHData, null, null);
         } else if(channelName === 'BTC_BCH') {

@@ -39,6 +39,7 @@ $(function () {
     socket.on('combined BTC_ETH books', function(orderBook) {
         BTC_ETHHOrderBook = orderBook;
         if($('#radio_1').is(':checked')) {
+            if(orderBook.ticker) $('#ticker').text(orderBook.ticker);
             _updateTables(BTC_ETHHOrderBook);
         }
     });
@@ -46,6 +47,7 @@ $(function () {
     socket.on('combined BTC_BCH books', function (orderBook) {
         BTC_BCHOrderBook = orderBook;
         if($('#radio_2').is(':checked')) {
+            if(orderBook.ticker) $('#ticker').text(orderBook.ticker);
             _updateTables(BTC_BCHOrderBook);
         }
     });
