@@ -6,7 +6,7 @@ const request = require('supertest'),
 
 describe('Binance response handler', function () {
     it('should process response properly', function (done) {
-        let formattedData = processResponse('BCCBTC', mockResponse);
+        let formattedData = processResponse('BTC_BCH', mockResponse);
         assert.deepEqual(formattedData, expectedData);
         done();
     });
