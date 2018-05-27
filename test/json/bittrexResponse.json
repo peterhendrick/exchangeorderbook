@@ -1,0 +1,45 @@
+{
+    "H": "CoreHub",
+    "M": "updateExchangeState",
+    "A": [
+        {
+            "MarketName": "BTC-BCC",
+            "Nounce": 22827,
+            "Buys": [
+                {
+                    "Type": 0,
+                    "Rate": "0.13491100",
+                    "Quantity": "1.214"
+                },
+                {
+                    "Type": 0,
+                    "Rate": "0.13490000",
+                    "Quantity": "67.088"
+                },
+                {
+                    "Type": 0,
+                    "Rate": "0.13487800",
+                    "Quantity": "0.538"
+                }
+            ],
+            "Sells": [
+                {
+                    "Type": 0,
+                    "Rate": "0.13504600",
+                    "Quantity": "0.067"
+                },
+                {
+                    "Type": 0,
+                    "Rate": "0.13504700",
+                    "Quantity": "0.978"
+                },
+                {
+                    "Type": 0,
+                    "Rate": "0.13504800",
+                    "Quantity": "0.141"
+                }
+            ],
+            "Fills": []
+        }
+    ]
+}
