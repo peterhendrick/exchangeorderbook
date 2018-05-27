@@ -22,7 +22,7 @@ http.listen((process.env.PORT || 8000), function() {
     console.log(`Listening on port ${process.env.PORT || 8000}`);
 });
 
-// subscribeToPoloniex(io);
+subscribeToPoloniex(io);
 subscribeToBittrex(io);
 subscribeToBinance(io);
 
