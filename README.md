@@ -5,6 +5,8 @@ Combined Order Book
 This package will provide a full-stack, combined exchange order book web application. Using socket.io, the tables will
 live update.
 
+To view a live version, visit exchangeorderbook.herokuapp.com
+
 To download:
 ```bash
 git clone https://github.com/peterhendrick/exchangeorderbook
