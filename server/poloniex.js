@@ -40,8 +40,8 @@ async function subscribeToPoloniex(io) {
         BTC_BCHTicker = tickers.BTC_BCH.last;
         BTC_ETHResponse = formatRESTResponse(BTC_ETHResponse);
         BTC_BCHResponse = formatRESTResponse(BTC_BCHResponse);
-        processResponse('BTC_ETH', BTC_ETHResponse, formattedBTCETHData);
-        processResponse('BTC_BCH', BTC_BCHResponse, formattedBTCBCHData);
+        formattedBTCETHData = processResponse('BTC_ETH', BTC_ETHResponse, formattedBTCETHData);
+        formattedBTCBCHData = processResponse('BTC_BCH', BTC_BCHResponse, formattedBTCBCHData);
         combineOrderBooks(io, 'BTC_ETH', formattedBTCETHData, null, null);
         combineOrderBooks(io, 'BTC_BCH', formattedBTCBCHData, null, null);
     }, 60000);
@@ -125,9 +125,8 @@ function _formatItems(items, market, sortOrder) {
 /**
  *
  * @param book: Raw order book data from Poloniex
- * @param seq: [Number] Sequence sent with the response from Poloniex
  * @param market
- * @returns {{bids: Array[], asks: Array[], seq: Number[]}}
+ * @returns {{bids: Array[], asks: Array[]}}
  * @private
  */
 function _formatInitialData(book, market) {
@@ -139,7 +138,6 @@ function _formatInitialData(book, market) {
 /**
  * Add newly published ask or bid item to the current data
  * @param data [Object] Ask or bid item to be added to the current data
- * @param seq [Number] Sequence sent with the response from Poloniex
  * @param formattedData [Object] Contains bid and ask arrays of previously formatted data
  * @param market [String] Cryptocurrency pair
  * @returns [Object] Formatted data with the new addition
@@ -158,7 +156,6 @@ function _addItem(data, formattedData, market) {
 /**
  * Add filled ask or bid item from the current data
  * @param data: [Object] Ask or bid item to be removed from the current data
- * @param seq: [Number] Sequence sent with the response from Poloniex
  * @param formattedData: [Object] Contains bid and ask arrays of previously formatted data
  * @param market: [String] Cryptocurrency pair
  * @returns {*}
