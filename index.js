@@ -4,9 +4,9 @@ const express = require('express'),
     app = express(),
     http = require('http').Server(app),
     io = require('socket.io')(http),
-    subscribeToBinance = require('./server/binance'),
-    subscribeToPoloniex = require('./server/poloniex'),
-    subscribeToBittrex = require('./server/bittrex');
+    subscribeToBinance = require('./server/binance').subscribeToBinance,
+    subscribeToPoloniex = require('./server/poloniex').subscribeToPoloniex,
+    subscribeToBittrex = require('./server/bittrex').subscribeToBittrex;
 
 
 app.get('/', function(req, res) {
@@ -22,6 +22,8 @@ http.listen((process.env.PORT || 8000), function() {
     console.log(`Listening on port ${process.env.PORT || 8000}`);
 });
 
-subscribeToPoloniex(io);
+// subscribeToPoloniex(io);
 subscribeToBittrex(io);
 subscribeToBinance(io);
+
+module.exports = http;
