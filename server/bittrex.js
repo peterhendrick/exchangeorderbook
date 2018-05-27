@@ -42,11 +42,11 @@ async function connect(io) {
     Bittrex.websockets.subscribe(['BTC-ETH', 'BTC-BCC'], function(data) {
         if(data.A[0].MarketName === 'BTC-ETH') {
             formattedETHData = formatOrderBook(data, formattedETHData, io);
-            combineOrderBooks(io, symbol, null, formattedETHData, null);
+            combineOrderBooks(io, 'BTC_ETH', null, formattedETHData, null);
         }
         if(data.A[0].MarketName === 'BTC-BCC') {
             formattedBCHData = formatOrderBook(data, formattedBCHData, io);
-            combineOrderBooks(io, symbol, null, formattedBCHData, null);
+            combineOrderBooks(io, 'BTC_BCH', null, formattedBCHData, null);
         }
     });
 

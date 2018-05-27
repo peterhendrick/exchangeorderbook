@@ -45,7 +45,7 @@ async function subscribeToPoloniex(io) {
         combineOrderBooks(io, 'BTC_ETH', formattedBTCETHData, null, null);
         combineOrderBooks(io, 'BTC_BCH', formattedBTCBCHData, null, null);
     }, 60000);
-    poloniex.on('message', (channelName, response, seq) => {
+    poloniex.on('message', (channelName, response) => {
         try{
             if(channelName === 'BTC_ETH') {
                 formattedBTCETHData = processResponse(channelName, response, formattedBTCETHData);
@@ -104,7 +104,7 @@ function formatRESTResponse(getOrderBookResponse) {
             data: formattedResponse,
             type: 'orderBook'
         }
-    ]
+    ];
 }
 
 /**

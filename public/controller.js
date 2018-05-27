@@ -45,9 +45,9 @@ $(function () {
             info: false,
             autoWidth: false,
             columnDefs: [{
-                "targets": '_all',
-                "createdCell": function (td) {
-                    $(td).css('padding', '10px')
+                'targets': '_all',
+                'createdCell': function (td) {
+                    $(td).css('padding', '10px');
                 }
             }]
         });

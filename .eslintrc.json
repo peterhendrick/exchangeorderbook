@@ -7,7 +7,9 @@
     },
     "globals": {
         "io": true,
-        "_": true
+        "_": true,
+        "describe": true,
+        "it": true
     },
     "extends": "eslint:recommended",
     "parserOptions": {
