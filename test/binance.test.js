@@ -1,5 +1,4 @@
-const request = require('supertest'),
-    processResponse = require('../server/binance').processResponse,
+const processResponse = require('../server/binance').processResponse,
     expectedData = require('./expectedData.js')('Binance'),
     mockResponse = require('./json/binanceResponse.json'),
     assert = require('assert');
