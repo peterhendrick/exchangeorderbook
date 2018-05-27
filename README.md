@@ -12,7 +12,7 @@ git clone https://github.com/peterhendrick/exchangeorderbook
 
 To install:
 ```bash
-npm install
+cd exchangeorderbook && npm install
 ```
 
 To test:
