@@ -1,6 +1,6 @@
 $(function () {
     let socket = io();
-    let BTC_ETHHOrderBook;
+    let BTC_ETHOrderBook;
     let BTC_BCHOrderBook;
     let BTC_ETHTicker;
     let BTC_BCHTicker;
@@ -10,7 +10,7 @@ $(function () {
 
     $('#BTC_ETH').on('click', function() {
         $('#ticker').text(BTC_ETHTicker + ' BTC / ETH');
-        _updateTables(BTC_ETHHOrderBook);
+        _updateTables(BTC_ETHOrderBook);
     }).click();
 
     $('#BTC_BCH').on('click', function() {
@@ -19,11 +19,11 @@ $(function () {
     });
 
     socket.on('combined BTC_ETH books', function(orderBook) {
-        BTC_ETHHOrderBook = orderBook;
+        BTC_ETHOrderBook = orderBook;
         if(orderBook.ticker) BTC_ETHTicker = orderBook.ticker;
         if($('#BTC_ETH').is(':checked')) {
             $('#ticker').text(BTC_ETHTicker + ' BTC / ETH');
-            _updateTables(BTC_ETHHOrderBook);
+            _updateTables(BTC_ETHOrderBook);
         }
     });
 
