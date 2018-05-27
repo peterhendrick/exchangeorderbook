@@ -5,7 +5,10 @@ const Bittrex = require('node-bittrex-api'),
     bluebird = require('bluebird'),
     _ = require('lodash');
 
-module.exports = subscribeToBittrex;
+module.exports = {
+    subscribeToBittrex: subscribeToBittrex,
+    formatOrderBook: formatOrderBook
+};
 
 let orderbookPromise = bluebird.promisify(Bittrex.getorderbook);
 
@@ -37,8 +40,14 @@ async function connect(io) {
         await _updateBaseData();
     }, 60000);
     Bittrex.websockets.subscribe(['BTC-ETH', 'BTC-BCC'], function(data) {
-        if(data.A[0].MarketName === 'BTC-ETH') _formatOrderBook(data, formattedETHData, io);
-        if(data.A[0].MarketName === 'BTC-BCC') _formatOrderBook(data, formattedBCHData, io);
+        if(data.A[0].MarketName === 'BTC-ETH') {
+            formattedETHData = formatOrderBook(data, formattedETHData, io);
+            combineOrderBooks(io, symbol, null, formattedETHData, null);
+        }
+        if(data.A[0].MarketName === 'BTC-BCC') {
+            formattedBCHData = formatOrderBook(data, formattedBCHData, io);
+            combineOrderBooks(io, symbol, null, formattedBCHData, null);
+        }
     });
 
     async function _updateBaseData() {
@@ -53,7 +62,7 @@ async function connect(io) {
     }
 }
 
-function _formatOrderBook(data, formattedData, io) {
+function formatOrderBook(data, formattedData) {
     if (data.M === 'updateExchangeState') {
         // type: 0 = add, 1 = remove, 2 = update
         let symbol = _formatSymbol(data.A[0].MarketName);
@@ -64,7 +73,7 @@ function _formatOrderBook(data, formattedData, io) {
 
             formattedData.asks = _.slice(formattedData.asks, 0, 100);
             formattedData.bids = _.slice(formattedData.bids, 0, 100);
-            combineOrderBooks(io, symbol, null, formattedData, null);
+            return formattedData;
         } catch (err) {
             console.log('Error in bittrex response');
         }
