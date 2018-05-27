@@ -68,10 +68,9 @@ async function subscribeToPoloniex(io) {
 
 /**
  * Processes raw response from Poloniex and formats the data then calls combinedOrderBooks module
- * @param io: [Server] Socket.io to be passed to the combineOrderBooks module
  * @param channelName: [String] Cryptocurrency pair
  * @param response: [Array] Array of one object containing the order book
- * @param seq: [Number] Sequence sent with the response from Poloniex
+ * @param formattedData: [Object] Array of one object containing the order book
  * @private
  */
 function processResponse(channelName, response, formattedData) {
