@@ -6,7 +6,8 @@ const Poloniex = require('poloniex-api-node'),
 
 module.exports = {
     subscribeToPoloniex: subscribeToPoloniex,
-    processResponse: processResponse
+    processResponse: processResponse,
+    formatRESTResponse: formatRESTResponse
 };
 
 /**
@@ -22,9 +23,13 @@ async function subscribeToPoloniex(io) {
 
     poloniex.subscribe('BTC_ETH');
     poloniex.subscribe('BTC_BCH');
-    let tickers = await poloniex.returnTicker();
-    BTC_ETHTicker = tickers.BTC_ETH.last;
-    BTC_BCHTicker = tickers.BTC_BCH.last;
+    try {
+        let tickers = await poloniex.returnTicker();
+        BTC_ETHTicker = tickers.BTC_ETH.last;
+        BTC_BCHTicker = tickers.BTC_BCH.last;
+    } catch (err) {
+        console.log(err);
+    }
     // Poloniex orders were becoming stale due to missed removes or updates, this setInterval function will
     // refresh the base data every 60 seconds to ensure removal of stale orders.
     setInterval(async function () {
@@ -33,14 +38,24 @@ async function subscribeToPoloniex(io) {
         let tickers = await poloniex.returnTicker();
         BTC_ETHTicker = tickers.BTC_ETH.last;
         BTC_BCHTicker = tickers.BTC_BCH.last;
-        BTC_ETHResponse = _formatRESTResponse(BTC_ETHResponse);
-        BTC_BCHResponse = _formatRESTResponse(BTC_BCHResponse);
-        _proccessResponse(io, 'BTC_ETH', BTC_ETHResponse, null, null);
-        _proccessResponse(io, 'BTC_BCH', BTC_BCHResponse, null, null);
-    }, 60000);
+        BTC_ETHResponse = formatRESTResponse(BTC_ETHResponse);
+        BTC_BCHResponse = formatRESTResponse(BTC_BCHResponse);
+        processResponse('BTC_ETH', BTC_ETHResponse, formattedBTCETHData);
+        processResponse('BTC_BCH', BTC_BCHResponse, formattedBTCBCHData);
+        combineOrderBooks(io, 'BTC_ETH', formattedBTCETHData, null, null);
+        combineOrderBooks(io, 'BTC_BCH', formattedBTCBCHData, null, null);
+    }, 5000);
     poloniex.on('message', (channelName, response, seq) => {
         try{
-            _proccessResponse(io, channelName, response, seq);
+            if(channelName === 'BTC_ETH') {
+                formattedBTCETHData = processResponse(channelName, response, formattedBTCETHData);
+                formattedBTCETHData.ticker = BTC_ETHTicker;
+                combineOrderBooks(io, channelName, formattedBTCETHData, null, null);
+            } else if(channelName === 'BTC_BCH') {
+                formattedBTCBCHData = processResponse(channelName, response, formattedBTCBCHData);
+                formattedBTCBCHData.ticker = BTC_BCHTicker;
+                combineOrderBooks(io, channelName, formattedBTCBCHData, null, null);
+            }
         } catch (err) {
             console.log('Error in Poloniex Response');
         }
@@ -49,42 +64,32 @@ async function subscribeToPoloniex(io) {
 
     poloniex.openWebSocket({version: 2});
 
-    /**
-     * Processes raw response from Poloniex and formats the data then calls combinedOrderBooks module
-     * @param io: [Server] Socket.io to be passed to the combineOrderBooks module
-     * @param channelName: [String] Cryptocurrency pair
-     * @param response: [Array] Array of one object containing the order book
-     * @param seq: [Number] Sequence sent with the response from Poloniex
-     * @private
-     */
-    function _proccessResponse(io, channelName, response, seq) {
-        if(response[0].type === 'orderBook'){
-            formattedBTCETHData = channelName === 'BTC_ETH' ? _formatInitialData(response[0], seq, channelName) : formattedBTCETHData;
-            formattedBTCBCHData = channelName === 'BTC_BCH' ? _formatInitialData(response[0], seq, channelName) : formattedBTCBCHData;
-        }
-        if(response[0].type === 'orderBookModify') {
-            formattedBTCETHData = channelName === 'BTC_ETH' ? _addItem(response[0].data, seq, formattedBTCETHData, channelName) : formattedBTCETHData;
-            formattedBTCBCHData = channelName === 'BTC_BCH' ? _addItem(response[0].data, seq, formattedBTCBCHData, channelName) : formattedBTCBCHData;
-        }
-        if(response[0].type === 'orderBookRemove') {
-            formattedBTCETHData = channelName === 'BTC_ETH' ? _removeItem(response[0].data, seq, formattedBTCETHData, channelName) : formattedBTCETHData;
-            formattedBTCBCHData = channelName === 'BTC_BCH' ? _removeItem(response[0].data, seq, formattedBTCBCHData, channelName) : formattedBTCBCHData;
-        }
-        if(formattedBTCETHData.asks.length > 100) formattedBTCETHData.asks = _.slice(formattedBTCETHData.asks, 0, 100);
-        if(formattedBTCETHData.bids.length > 100) formattedBTCETHData.bids = _.slice(formattedBTCETHData.bids, 0, 100);
-        if(formattedBTCBCHData.asks.length > 100) formattedBTCBCHData.asks = _.slice(formattedBTCBCHData.asks, 0, 100);
-        if(formattedBTCBCHData.bids.length > 100) formattedBTCBCHData.bids = _.slice(formattedBTCBCHData.bids, 0, 100);
-        formattedBTCETHData.ticker = BTC_ETHTicker;
-        formattedBTCBCHData.ticker = BTC_BCHTicker;
-        if(channelName === 'BTC_ETH') {
-            combineOrderBooks(io, channelName, formattedBTCETHData, null, null);
-        } else if(channelName === 'BTC_BCH') {
-            combineOrderBooks(io, channelName, formattedBTCBCHData, null, null);
-        }
-    }
 }
 
-function _formatRESTResponse(getOrderBookResponse) {
+/**
+ * Processes raw response from Poloniex and formats the data then calls combinedOrderBooks module
+ * @param io: [Server] Socket.io to be passed to the combineOrderBooks module
+ * @param channelName: [String] Cryptocurrency pair
+ * @param response: [Array] Array of one object containing the order book
+ * @param seq: [Number] Sequence sent with the response from Poloniex
+ * @private
+ */
+function processResponse(channelName, response, formattedData) {
+    if(response[0].type === 'orderBook'){
+        formattedData = _formatInitialData(response[0], channelName);
+    }
+    if(response[0].type === 'orderBookModify') {
+        formattedData = _addItem(response[0].data, formattedData, channelName);
+    }
+    if(response[0].type === 'orderBookRemove') {
+        formattedData = _removeItem(response[0].data, formattedData, channelName);
+    }
+    if(formattedData.asks.length > 100) formattedData.asks = _.slice(formattedData.asks, 0, 100);
+    if(formattedData.bids.length > 100) formattedData.bids = _.slice(formattedData.bids, 0, 100);
+    return formattedData;
+}
+
+function formatRESTResponse(getOrderBookResponse) {
     let formattedResponse = {asks: {}, bids: {}};
     getOrderBookResponse.asks.forEach(ask => {
         let askObject = _.fromPairs([ask]);
@@ -125,10 +130,10 @@ function _formatItems(items, market, sortOrder) {
  * @returns {{bids: Array[], asks: Array[], seq: Number[]}}
  * @private
  */
-function _formatInitialData(book, seq, market) {
+function _formatInitialData(book, market) {
     let asks = _formatItems(book.data.asks, market, 'asc');
     let bids = _formatItems(book.data.bids, market, 'desc');
-    return {bids: bids, asks: asks, seq: seq};
+    return {bids: bids, asks: asks};
 }
 
 /**
@@ -140,14 +145,13 @@ function _formatInitialData(book, seq, market) {
  * @returns [Object] Formatted data with the new addition
  * @private
  */
-function _addItem(data, seq, formattedData, market) {
+function _addItem(data, formattedData, market) {
     let addAskItem = data.type === 'ask' ? _createItemObject(data, market) : null;
     let addBidItem = data.type === 'bid' ? _createItemObject(data, market) : null;
     if(addAskItem) formattedData.asks = _filterArray(formattedData.asks, addAskItem);
     if(addBidItem) formattedData.bids = _filterArray(formattedData.bids, addBidItem);
     formattedData.asks = _.chain(formattedData.asks).concat(addAskItem).orderBy(['price'], ['asc']).compact().value();
     formattedData.bids = _.chain(formattedData.bids).concat(addBidItem).orderBy(['price'], ['desc']).compact().value();
-    formattedData.seq = seq;
     return formattedData;
 }
 
@@ -160,12 +164,11 @@ function _addItem(data, seq, formattedData, market) {
  * @returns {*}
  * @private
  */
-function _removeItem(data, seq, formattedData, market) {
+function _removeItem(data, formattedData, market) {
     let removeAskItem = data.type === 'ask' ? _createItemObject(data, market) : null;
     let removeBidItem = data.type === 'bid' ? _createItemObject(data, market) : null;
     if(removeAskItem) formattedData.asks = _filterArray(formattedData.asks, removeAskItem);
     if(removeBidItem) formattedData.bids = _filterArray(formattedData.bids, removeBidItem);
-    formattedData.seq = seq;
     return formattedData;
 }
 
