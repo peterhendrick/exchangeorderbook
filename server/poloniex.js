@@ -4,7 +4,10 @@ const Poloniex = require('poloniex-api-node'),
     combineOrderBooks = require('./combined'),
     _ = require('lodash');
 
-module.exports = subscribeToPoloniex;
+module.exports = {
+    subscribeToPoloniex: subscribeToPoloniex,
+    processResponse: processResponse
+};
 
 /**
  * Subscribes to Poloniex and processes response
