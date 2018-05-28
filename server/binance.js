@@ -9,6 +9,10 @@ module.exports = {
     processResponse: processResponse
 };
 
+/**
+ * Connect to binance websocket and format the data to be combined with other exchange data and sent to the client.
+ * @param io {Server} Websocket server to be passed along and emit messages to the client.
+ */
 function subscribeToBinance(io) {
     binance.websockets.depthCache(['ETHBTC', 'BCCBTC'], (symbol, depth) => {
         symbol = _formatSymbol(symbol);
@@ -17,21 +21,21 @@ function subscribeToBinance(io) {
     });
 }
 
-function processResponse(symbol, depth) {
-    let bids = binance.sortBids(depth.bids);
-    let asks = binance.sortAsks(depth.asks);
-    let formattedData = _processResponse(bids, asks, symbol);
-    if(formattedData.asks.length > 100) formattedData.asks = _.slice(formattedData.asks, 0, 100);
-    if(formattedData.bids.length > 100) formattedData.bids = _.slice(formattedData.bids, 0, 100);
-    return formattedData;
-}
-
 function _formatSymbol(symbol) {
     if(symbol === 'ETHBTC') return 'BTC_ETH';
     if(symbol === 'BCCBTC') return 'BTC_BCH';
 }
 
-function _processResponse(bids, asks, symbol) {
+function processResponse(symbol, depth) {
+    let bids = binance.sortBids(depth.bids);
+    let asks = binance.sortAsks(depth.asks);
+    let formattedData = _formatData(bids, asks, symbol);
+    if(formattedData.asks.length > 100) formattedData.asks = _.slice(formattedData.asks, 0, 100);
+    if(formattedData.bids.length > 100) formattedData.bids = _.slice(formattedData.bids, 0, 100);
+    return formattedData;
+}
+
+function _formatData(bids, asks, symbol) {
     let formattedBids = _.map(bids, (value, key) => _createItemObject(value, key, symbol));
     let formattedAsks = _.map(asks, (value, key) => _createItemObject(value, key, symbol));
     return {bids: formattedBids, asks: formattedAsks};

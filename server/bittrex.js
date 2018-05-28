@@ -51,10 +51,12 @@ async function connect(io) {
     });
 
     async function _updateBaseData() {
-        // The Bittrex module breaks nodejs convention and returns success as first callback parameter
-        // bluebird treats this first parameter as an error so need to catch and return the error.
-        let ethOrderBook = await orderbookPromise({ market : 'BTC-ETH', type : 'both' }).catch(err => err);
-        let bchOrderBook = await orderbookPromise({ market : 'BTC-BCC', type : 'both' }).catch(err => err);
+        let [ethOrderBook, bchOrderBook] = await Promise.all([
+            // The Bittrex module breaks nodejs convention and returns success as first callback parameter
+            // bluebird treats this first parameter as an error so need to catch and return the error.
+            orderbookPromise({ market : 'BTC-ETH', type : 'both' }).catch(err => err),
+            orderbookPromise({ market : 'BTC-BCC', type : 'both' }).catch(err => err)
+        ]);
         formattedETHData = _formatInitialData(ethOrderBook.result, 'BTC_ETH');
         combineOrderBooks(io, 'BTC_ETH', null, formattedETHData, null);
         formattedBCHData = _formatInitialData(bchOrderBook.result, 'BTC_BCH');
@@ -62,6 +64,31 @@ async function connect(io) {
     }
 }
 
+/**
+ * Formats data from the REST Api call to get or reset the initial order book
+ * @param book {Object} The result property from the Bittrex REST API call.
+ * @param market {String} Cryptocurrency market pair.
+ * @returns {Object} Bids and asks to be combined with other exchanges and sent to the client.
+ * @private
+ */
+function _formatInitialData(book, market) {
+    let asks = _.chain(book.sell)
+        .map(ask => _createItemObject(ask, market))
+        .orderBy(['price'], ['asc'])
+        .value();
+    let bids = _.chain(book.buy)
+        .map(bid => _createItemObject(bid, market))
+        .orderBy(['price'], ['desc'])
+        .value();
+    return {bids: bids, asks: asks};
+}
+
+/**
+ * Updates the existing order book data based on updates from the websocket.
+ * @param data {Object} Raw data response from the bittrex websocket
+ * @param formattedData {Object} Existing formatted data already in memory from previous REST and websocket results.
+ * @returns {Object} Updated formatted data to be combined with other exchanges to be sent to the client.
+ */
 function formatOrderBook(data, formattedData) {
     if (data.M === 'updateExchangeState') {
         // type: 0 = add, 1 = remove, 2 = update
@@ -85,34 +112,6 @@ function _formatSymbol(symbol) {
     if(symbol === 'BTC-BCC') return 'BTC_BCH';
 }
 
-/**
- * Format Bittrex Response
- * @param book: [Object] The first item in the array response from Bittrex.
- * @param seq: [Number] Sequence number included with the response
- * @param market: [String] Cryptocurrecny pair with bids or asks
- * @returns {{bids: *, asks: *}}: [Object] Formatted object to be combined with other exchange data.
- * @private
- */
-
-function _formatInitialData(book, market) {
-    let asks = _.chain(book.sell)
-        .map(ask => _createItemObject(ask, market))
-        .orderBy(['price'], ['asc'])
-        .value();
-    let bids = _.chain(book.buy)
-        .map(bid => _createItemObject(bid, market))
-        .orderBy(['price'], ['desc'])
-        .value();
-    return {bids: bids, asks: asks};
-}
-
-/**
- * Creates a formatted object to be sent to the client
- * @param data: [Object] Ask or bid item to be formatted
- * @param market: [String] Cryptocurrency pair
- * @returns [Object] Formatted ask or bid object
- * @private
- */
 function _createItemObject(data, market) {
     return {
         price: data.Rate.toString(),

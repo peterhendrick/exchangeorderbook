@@ -33,9 +33,11 @@ async function subscribeToPoloniex(io) {
     // Poloniex orders were becoming stale due to missed removes or updates, this setInterval function will
     // refresh the base data every 60 seconds to ensure removal of stale orders.
     setInterval(async function () {
-        let BTC_ETHResponse = await poloniex.returnOrderBook('BTC_ETH', 100);
-        let BTC_BCHResponse = await poloniex.returnOrderBook('BTC_BCH', 100);
-        let tickers = await poloniex.returnTicker();
+        let [BTC_ETHResponse, BTC_BCHResponse, tickers] = await Promise.all([
+            poloniex.returnOrderBook('BTC_ETH', 100),
+            poloniex.returnOrderBook('BTC_BCH', 100),
+            poloniex.returnTicker()
+        ]);
         BTC_ETHTicker = tickers.BTC_ETH.last;
         BTC_BCHTicker = tickers.BTC_BCH.last;
         BTC_ETHResponse = formatRESTResponse(BTC_ETHResponse);
@@ -67,6 +69,30 @@ async function subscribeToPoloniex(io) {
 }
 
 /**
+ * Processes REST response and converts it to match the websocket response structure to be used by the
+ * processResponse method
+ * @param getOrderBookResponse {Object} Raw response from bittrex REST call
+ * @returns {Array} Formatted to match the websocket response structure.
+ */
+function formatRESTResponse(getOrderBookResponse) {
+    let formattedResponse = {asks: {}, bids: {}};
+    getOrderBookResponse.asks.forEach(ask => {
+        let askObject = _.fromPairs([ask]);
+        _.assign(formattedResponse.asks, askObject);
+    });
+    getOrderBookResponse.bids.forEach(bid => {
+        let bidObject = _.fromPairs([bid]);
+        _.assign(formattedResponse.bids, bidObject);
+    });
+    return [
+        {
+            data: formattedResponse,
+            type: 'orderBook'
+        }
+    ];
+}
+
+/**
  * Processes raw response from Poloniex and formats the data then calls combinedOrderBooks module
  * @param channelName: [String] Cryptocurrency pair
  * @param response: [Array] Array of one object containing the order book
@@ -88,32 +114,12 @@ function processResponse(channelName, response, formattedData) {
     return formattedData;
 }
 
-function formatRESTResponse(getOrderBookResponse) {
-    let formattedResponse = {asks: {}, bids: {}};
-    getOrderBookResponse.asks.forEach(ask => {
-        let askObject = _.fromPairs([ask]);
-        _.assign(formattedResponse.asks, askObject);
-    });
-    getOrderBookResponse.bids.forEach(bid => {
-        let bidObject = _.fromPairs([bid]);
-        _.assign(formattedResponse.bids, bidObject);
-    });
-    return [
-        {
-            data: formattedResponse,
-            type: 'orderBook'
-        }
-    ];
+function _formatInitialData(book, market) {
+    let asks = _formatItems(book.data.asks, market, 'asc');
+    let bids = _formatItems(book.data.bids, market, 'desc');
+    return {bids: bids, asks: asks};
 }
 
-/**
- * Formats ask and bid arrays from response
- * @param items: [Object] Collection of either ask or bid objects
- * @param market: [String] Cryptocurrency pair
- * @param sortOrder: [String] Sort order of the array to be returned
- * @returns [Array] Array of formatted objects, either ask or bid
- * @private
- */
 function _formatItems(items, market, sortOrder) {
     return _.chain(items)
         .map((value, key) => _createItemObject({rate: key, amount: value}, market))
@@ -121,27 +127,6 @@ function _formatItems(items, market, sortOrder) {
         .value();
 }
 
-/**
- *
- * @param book: Raw order book data from Poloniex
- * @param market
- * @returns {{bids: Array[], asks: Array[]}}
- * @private
- */
-function _formatInitialData(book, market) {
-    let asks = _formatItems(book.data.asks, market, 'asc');
-    let bids = _formatItems(book.data.bids, market, 'desc');
-    return {bids: bids, asks: asks};
-}
-
-/**
- * Add newly published ask or bid item to the current data
- * @param data [Object] Ask or bid item to be added to the current data
- * @param formattedData [Object] Contains bid and ask arrays of previously formatted data
- * @param market [String] Cryptocurrency pair
- * @returns [Object] Formatted data with the new addition
- * @private
- */
 function _addItem(data, formattedData, market) {
     let addAskItem = data.type === 'ask' ? _createItemObject(data, market) : null;
     let addBidItem = data.type === 'bid' ? _createItemObject(data, market) : null;
@@ -152,14 +137,6 @@ function _addItem(data, formattedData, market) {
     return formattedData;
 }
 
-/**
- * Add filled ask or bid item from the current data
- * @param data: [Object] Ask or bid item to be removed from the current data
- * @param formattedData: [Object] Contains bid and ask arrays of previously formatted data
- * @param market: [String] Cryptocurrency pair
- * @returns {*}
- * @private
- */
 function _removeItem(data, formattedData, market) {
     let removeAskItem = data.type === 'ask' ? _createItemObject(data, market) : null;
     let removeBidItem = data.type === 'bid' ? _createItemObject(data, market) : null;
@@ -168,24 +145,10 @@ function _removeItem(data, formattedData, market) {
     return formattedData;
 }
 
-/**
- * Filters array and returns new array with the filtered item removed
- * @param array [Array] Array to be filtered
- * @param filterItem [Object] Object to be removed from the array
- * @returns [Array] Filtered array
- * @private
- */
 function _filterArray(array, filterItem) {
     return _.filter(array, item => item.price !== filterItem.price);
 }
 
-/**
- * Creates a formatted object to be sent to the client
- * @param data: [Object] Ask or bid item to be formatted
- * @param market: [String] Cryptocurrency pair
- * @returns [Object] Formatted ask or bid object
- * @private
- */
 function _createItemObject(data, market) {
     return {
         price: data.rate,
