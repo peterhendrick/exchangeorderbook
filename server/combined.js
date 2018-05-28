@@ -76,7 +76,7 @@ function _mergeMatchingPricePoints(combinedArray) {
                 exchange: exchangesString,
                 market: dupPrices[0].market,
                 highlight: dupPrices[0].highlight
-            })
+            });
         }
     });
     return combinedArray;
