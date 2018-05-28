@@ -10,30 +10,30 @@
         <script src="/public/controller.js"></script>
     </head>
     <body>
-    <h1 class="text_center">Combined Order Books</h1>
-    <p class="text_center">
+    <h1>Combined Order Books</h1>
+    <p>
         *Bids highlighted in <span class="bids">green</span> and asks highlighted in
         <span class="asks">red</span> indicate overlapping orders across exchanges.
     </p>
-    <p class="text_center">
+    <p>
         *Ticker is from poloniex only and is updated every 60 seconds based on the last trade price.
     </p>
-    <div class="text_center">
+    <div>
         <h3>Market</h3>
     </div>
-    <div class="text_center">
+    <div>
         <input type="radio" id="BTC_ETH" name="type" value="BTC_ETH">
         <label for="BTC_ETH">BTC_ETH</label>
     </div>
     <br/>
-    <div class="text_center">
+    <div>
         <input type="radio" id="BTC_BCH" name="type" value="BTC_BCH">
         <label for="BTC_BCH">BTC_BCH</label>
     </div>
-    <h4 class="text_center">Ticker: <span id="ticker"></span></h4>
+    <h4 id="tickerHeader">Ticker: <span id="ticker"></span></h4>
     <div class="tables_container">
         <div class="table_container">
-            <h2 class="text_center">Bids</h2>
+            <h2>Bids</h2>
             <table id="bidTable" class="table">
                 <thead>
                 <tr>
@@ -46,7 +46,7 @@
             </table>
         </div>
         <div class="table_container">
-            <h2 class="text_center">Asks</h2>
+            <h2>Asks</h2>
             <table id="askTable" class="table">
                 <thead>
                 <tr>

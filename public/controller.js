@@ -8,6 +8,9 @@ $(function () {
     let bidDT = _initializeDataTable('#bidTable', 'desc');
     let askDT = _initializeDataTable('#askTable', 'asc');
 
+    // Prevents showing undefined if the ticker has not yet been sent from Poloniex.
+    $('#tickerHeader').hide();
+
     $('#BTC_ETH').on('click', function() {
         $('#ticker').text(BTC_ETHTicker + ' BTC / ETH');
         _updateTables(BTC_ETHOrderBook);
@@ -22,6 +25,7 @@ $(function () {
         BTC_ETHOrderBook = orderBook;
         if(orderBook.ticker) BTC_ETHTicker = orderBook.ticker;
         if($('#BTC_ETH').is(':checked')) {
+            if(BTC_ETHTicker) $('#tickerHeader').show();
             $('#ticker').text(BTC_ETHTicker + ' BTC / ETH');
             _updateTables(BTC_ETHOrderBook);
         }
@@ -31,6 +35,7 @@ $(function () {
         BTC_BCHOrderBook = orderBook;
         if(orderBook.ticker) BTC_BCHTicker = orderBook.ticker;
         if($('#BTC_BCH').is(':checked')) {
+            if(BTC_BCHTicker) $('#tickerHeader').show();
             $('#ticker').text(BTC_BCHTicker + ' BTC / BCH');
             _updateTables(BTC_BCHOrderBook);
         }
@@ -95,5 +100,4 @@ $(function () {
         });
         dataTable.draw();
     }
-
 });
