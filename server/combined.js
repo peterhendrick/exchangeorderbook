@@ -12,11 +12,11 @@ module.exports = combineOrderBooks;
 
 /**
  * Combines order books from multiple exchanges and emits event and data to the client
- * @param io: [Server] socket.io to send results to the client.
- * @param channelName: [String] Cryptocurrency market pair.
- * @param poloniexOrderBook: [Object] Formatted order book from the Poloniex Exchange
- * @param bittrexOrderBook: [Object] Formatted order book from the Bittrex Exchange
- * @param binanceOrderBook: [Object] Formatted order book from the Binance Exchange
+ * @param io: {Server} socket.io to send results to the client.
+ * @param channelName: {String} Cryptocurrency market pair.
+ * @param poloniexOrderBook: {Object} Formatted order book from the Poloniex Exchange
+ * @param bittrexOrderBook: {Object} Formatted order book from the Bittrex Exchange
+ * @param binanceOrderBook: {Object} Formatted order book from the Binance Exchange
  */
 function combineOrderBooks(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook) {
     if(channelName === 'BTC_ETH') _formatAndEmitBTCETH(io, channelName, poloniexOrderBook, bittrexOrderBook, binanceOrderBook);

@@ -16,7 +16,7 @@ module.exports = {
 function subscribeToBinance(io) {
     binance.websockets.depthCache(['ETHBTC', 'BCCBTC'], (symbol, depth) => {
         symbol = _formatSymbol(symbol);
-        let formattedData = processResponse(symbol, depth, io);
+        let formattedData = processResponse(symbol, depth);
         combineOrderBooks(io, symbol, null, null, formattedData);
     });
 }

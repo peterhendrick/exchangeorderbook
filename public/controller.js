@@ -8,7 +8,6 @@ $(function () {
     let bidDT = _initializeDataTable('#bidTable', 'desc');
     let askDT = _initializeDataTable('#askTable', 'asc');
 
-    // Prevents showing undefined if the ticker has not yet been sent from Poloniex.
     $('#ticker').text('Waiting for Poloniex');
 
     $('#BTC_ETH').on('click', function() {
