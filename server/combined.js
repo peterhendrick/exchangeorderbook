@@ -49,7 +49,35 @@ function _combinedArray(arr1, arr2, arr3, sort) {
     return _.chain(arr1)
         .concat(arr2)
         .concat(arr3)
+        .tap(combinedArray => _mergeMatchingPricePoints(combinedArray))
         .orderBy(['price'], [sort])
         .filter(item => !_.includes(item.price, 'e')) // Bittrex was returning weird trades that threw off highlighting
         .value();
+}
+
+function _mergeMatchingPricePoints(combinedArray) {
+    combinedArray.forEach(order => {
+        let dupPrices = _.filter(combinedArray, item => Number(order.price) === Number(item.price));
+        if(dupPrices.length > 1) {
+            _.remove(combinedArray, function(order) {
+                return _.includes(dupPrices, order);
+            });
+            let combinedVolume = _.sumBy(dupPrices, order => Number(order.volume));
+            combinedVolume = _.round(combinedVolume, 8).toString();
+            let combinedExchangeArray = _.chain(dupPrices).map(order => order.exchange).uniq().value();
+            let exchangesString = '';
+            combinedExchangeArray.forEach((exchangeString, index) => {
+                if(index === 0) exchangesString += exchangeString;
+                if(index > 0) exchangesString += `, ${exchangeString}`;
+            });
+            combinedArray.push({
+                price: dupPrices[0].price,
+                volume: combinedVolume,
+                exchange: exchangesString,
+                market: dupPrices[0].market,
+                highlight: dupPrices[0].highlight
+            });
+        }
+    });
+    return combinedArray;
 }
