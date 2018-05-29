@@ -12,7 +12,7 @@ module.exports = {
 
 /**
  * Subscribes to Poloniex and processes response
- * @param io: passes socket.io to the combineOrderBooks module
+ * @param io: {Server} passes socket.io to the combineOrderBooks module
  */
 async function subscribeToPoloniex(io) {
     let poloniex = new Poloniex();
@@ -94,9 +94,9 @@ function formatRESTResponse(getOrderBookResponse) {
 
 /**
  * Processes raw response from Poloniex and formats the data then calls combinedOrderBooks module
- * @param channelName: [String] Cryptocurrency pair
- * @param response: [Array] Array of one object containing the order book
- * @param formattedData: [Object] Array of one object containing the order book
+ * @param channelName: {String} Cryptocurrency pair
+ * @param response: {Array} Array of one object containing the order book
+ * @param formattedData: {Object} Array of one object containing the order book
  * @private
  */
 function processResponse(channelName, response, formattedData) {

@@ -14,7 +14,7 @@ let orderbookPromise = bluebird.promisify(Bittrex.getorderbook);
 
 /**
  * Subscribe to the Bittrex websocket
- * @param io: passes socket.io to be used by the combineOrderBooks module
+ * @param io: {Server} passes socket.io to be used by the combineOrderBooks module
  */
 function subscribeToBittrex(io) {
     Bittrex.options({
@@ -28,7 +28,7 @@ function subscribeToBittrex(io) {
 
 /**
  * Connect to Bittrex, make call to get order book and format response
- * @param io: passes socket.io to be used by the combineOrderBooks module
+ * @param io: {Server} passes socket.io to be used by the combineOrderBooks module
  */
 async function connect(io) {
     let formattedETHData;
@@ -91,7 +91,6 @@ function _formatInitialData(book, market) {
  */
 function formatOrderBook(data, formattedData) {
     if (data.M === 'updateExchangeState') {
-        // type: 0 = add, 1 = remove, 2 = update
         let symbol = _formatSymbol(data.A[0].MarketName);
         try{
             let orderBookUpdates = data.A[0];
